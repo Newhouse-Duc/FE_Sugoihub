@@ -3,7 +3,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import AuthReducer from './Auth/Auth.slice'
 import FriendShipReducer from './FriendShip/FriendShip.slice'
 import UserReducer from './User/User.slice'
-
+import DashboardReducer from './Admin/Admin_dashboard/Admin_dashboard.slice'
 import PostReducer from './Post/Post.slice'
 import ChatSReducer from './Chat/Chat.sllice'
 import CommentReducer from './Comment/Comment.slice'
@@ -15,7 +15,7 @@ export const store = configureStore({
         auth: AuthReducer,
         friendship: FriendShipReducer,
         userdetail: UserReducer,
-
+        admindashboard: DashboardReducer,
         post: PostReducer,
         chat: ChatSReducer,
         comment: CommentReducer,

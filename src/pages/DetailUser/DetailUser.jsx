@@ -17,15 +17,15 @@ const DetailUser = () => {
   const receivedRequests = useSelector((state) => state.friendship.receivedRequests)
   const sentRequests = useSelector((state) => state.friendship.sentRequests)
   const allpost = useSelector((state) => state.post.allpost)
-
+  useEffect(() => {
+    dispatch(userdetail({ id }))
+  }, [id])
   useEffect(() => {
 
     dispatch(allfriendship({ id: userinfor._id }));
     dispatch(allPostGues({ id: userinfor._id, userid: id }));
-  }, [dispatch, userinfor, receivedRequests, sentRequests]);
-  useEffect(() => {
-    dispatch(userdetail({ id }))
-  }, [id])
+  }, [dispatch, id, userinfor._id]);
+
 
   const handleAddFriend = () => {
     const data = {
@@ -171,10 +171,7 @@ const DetailUser = () => {
     <div className="w-full justify-center max-w-4xl mx-auto my-2 md:my-4 px-2 md:px-4">
       <div className="w-full p-2 md:p-5 border border-gray-300 rounded-lg shadow-xl bg-white">
         <figure className="relative h-32 md:h-48">
-          <img
-            className="w-full h-full object-cover rounded-t-lg"
-            alt="Background Image"
-          />
+
           <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 bg-gradient-to-t from-black/50 to-transparent">
             <div className="avatar">
               <div className="ring-primary ring-offset-base-100 w-16 md:w-24 rounded-full ring ring-offset-2">

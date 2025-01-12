@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { message } from 'antd';
-import { changepassword, login, register, verifyotp, userprofile, refreshtoken, logoutuser, sendotp, listUser, forgotPassword, verifyOtpResetPassword, resetPassword, updateprofileuser, listfriend }
+import { changepassword, logoutadmin, login, register, verifyotp, userprofile, refreshtoken, logoutuser, sendotp, listUser, forgotPassword, verifyOtpResetPassword, resetPassword, updateprofileuser, listfriend }
     from './Auth.thunk';
 import { loginAdmin, adminprofile } from './Auth.thunk';
 
@@ -74,11 +74,28 @@ export const authSlice = createSlice({
                 state.isAuthenticated = false;
                 state.error = action.error.message
             })
+
+            // logout admin
+
+            .addCase(logoutadmin.pending, (state) => {
+                state.isLoading = true
+            })
+            .addCase(logoutadmin.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isAdminAuthenticated = false;
+                message.success(action.payload.message)
+                state.admininfor = null
+            })
+            .addCase(logoutadmin.rejected, (state, action) => {
+                state.isLoading = false
+                state.isAuthenticated = false;
+                state.error = action.error.message
+            })
             // send otp 
 
-            // .addCase(sendotp.pending, (state) => {
-            //     state.isLoading = true
-            // })
+            .addCase(sendotp.pending, (state) => {
+                state.isLoading = true
+            })
             .addCase(sendotp.fulfilled, (state, action) => {
                 state.isLoading = false
                 message.success(action.payload.message)

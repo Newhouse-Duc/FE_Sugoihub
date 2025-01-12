@@ -55,7 +55,7 @@ const Register = () => {
         dispatch(setView('LOGIN'));
     };
 
-    // Animation variants
+
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {

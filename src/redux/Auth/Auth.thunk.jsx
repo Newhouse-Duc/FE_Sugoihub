@@ -3,7 +3,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
 import { message } from 'antd';
 import { handleUpdatePassword, handleUpdateProfile, handlelogin, handleregister, handleverifyotp, handleprofile, handlerefreshtoken, handleLogout, handleSendOTP, handleListUser, handleForgotPassword, handleVerifyOtpResetPassword, handleResetPassWord, handleGetFriend }
     from '../../services/user';
-import { handleloginAdmin, handleadminprofile } from '../../services/admin';
+import { handleloginAdmin, handleadminprofile, handleLogoutAdmin } from '../../services/admin';
 
 
 export const login = createAsyncThunk(
@@ -98,6 +98,17 @@ export const logoutuser = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             return await handleLogout()
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+)
+
+export const logoutadmin = createAsyncThunk(
+    'auth/admin/logout',
+    async (_, { rejectWithValue }) => {
+        try {
+            return await handleLogoutAdmin()
         } catch (error) {
             return rejectWithValue(error.response.data);
         }

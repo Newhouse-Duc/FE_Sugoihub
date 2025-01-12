@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Button, Modal, message, Upload, Image, Input, Avatar, Tabs } from 'antd';
+import { Button, Select, message, Upload, Image, Input, Avatar, Tabs } from 'antd';
 import { updateprofileuser } from '../../redux/Auth/Auth.thunk';
 import { useFormik } from 'formik'
 import { validationDateSchema } from '../../validates/validates';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { changepassword } from '../../redux/Auth/Auth.thunk';
 import { motion } from 'framer-motion';
+const { Option } = Select;
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -58,7 +59,7 @@ const Setting = () => {
         setNewRemoveAvatar(null)
     }
     const handleChangPassword = async () => {
-        // Kiểm tra các trường hợp thiếu dữ liệu
+
         if (!oldpassword) {
             message.error("Vui lòng nhập mật khẩu cũ");
             return;
@@ -68,20 +69,20 @@ const Setting = () => {
             return;
         }
 
-        // Kiểm tra mật khẩu mới có đủ mạnh không (tuỳ chọn)
+
         if (newpassword.length < 6) {
             message.error("Mật khẩu mới phải có ít nhất 6 ký tự");
             return;
         }
 
-        // Tạo đối tượng dữ liệu
+
         const data = {
             oldpassword,
             newpassword,
         };
 
         try {
-            // Gọi action change password và đợi kết quả
+
             const result = await dispatch(changepassword({ data })).unwrap()
 
             // Xử lý kết quả thành công
@@ -104,6 +105,7 @@ const Setting = () => {
         month: birthDate.getUTCMonth() + 1,
         year: birthDate.getUTCFullYear(),
     };
+
 
     const formik = useFormik({
         initialValues: {
@@ -172,11 +174,24 @@ const Setting = () => {
         const year = parseInt(formik.values.year, 10);
         const month = parseInt(formik.values.month, 10);
 
-        if (year && month) {
+        if (month && year) {
             const days = new Date(year, month, 0).getDate();
             setDaysInMonth(days);
+
+
+            if (formik.values.day > days) {
+                formik.setFieldValue("day", days);
+            }
+        } else if (month) {
+            const days = new Date(2024, month, 0).getDate();
+            setDaysInMonth(days);
+
+
+            if (formik.values.day > days) {
+                formik.setFieldValue("day", days);
+            }
         }
-    }, [formik.values.month, formik.values.year]);
+    }, [formik.values.month, formik.values.year, formik.values.day]);
     const items = [
         {
             key: '1',
@@ -256,52 +271,52 @@ const Setting = () => {
                                 <label className="block text-sm font-medium text-gray-700">Ngày Sinh</label>
                                 <div className="flex gap-2">
                                     {/* Ngày */}
-                                    <select
+                                    <Select
                                         name="day"
                                         value={formik.values.day}
-                                        onChange={formik.handleChange}
+                                        onChange={value => formik.setFieldValue("day", value)}
                                         onBlur={formik.handleBlur}
-                                        className="bg-white"
+                                        className="w-24 h-10"
+                                        placeholder="Ngày"
                                     >
-                                        <option value="" disabled hidden>Ngày</option>
                                         {Array.from({ length: daysInMonth }, (_, i) => (
-                                            <option key={i + 1} value={i + 1}>
+                                            <Option key={i + 1} value={i + 1}>
                                                 {i + 1}
-                                            </option>
+                                            </Option>
                                         ))}
-                                    </select>
+                                    </Select>
 
                                     {/* Tháng */}
-                                    <select
+                                    <Select
                                         name="month"
                                         value={formik.values.month}
-                                        onChange={formik.handleChange}
+                                        onChange={value => formik.setFieldValue("month", value)}
                                         onBlur={formik.handleBlur}
-                                        className="bg-white"
+                                        className="w-24 h-10"
+                                        placeholder="Tháng"
                                     >
-                                        <option value="" disabled hidden>Tháng</option>
                                         {Array.from({ length: 12 }, (_, i) => (
-                                            <option key={i + 1} value={i + 1}>
+                                            <Option key={i + 1} value={i + 1}>
                                                 {i + 1}
-                                            </option>
+                                            </Option>
                                         ))}
-                                    </select>
+                                    </Select>
 
                                     {/* Năm */}
-                                    <select
+                                    <Select
                                         name="year"
                                         value={formik.values.year}
-                                        onChange={formik.handleChange}
+                                        onChange={value => formik.setFieldValue("year", value)}
                                         onBlur={formik.handleBlur}
-                                        className="bg-white"
+                                        className="w-28 h-10"
+                                        placeholder="Năm"
                                     >
-                                        <option value="" disabled hidden>Năm</option>
                                         {Array.from({ length: 100 }, (_, i) => (
-                                            <option key={i} value={new Date().getFullYear() - i}>
+                                            <Option key={i} value={new Date().getFullYear() - i}>
                                                 {new Date().getFullYear() - i}
-                                            </option>
+                                            </Option>
                                         ))}
-                                    </select>
+                                    </Select>
                                 </div>
                                 {(formik.touched.day && formik.errors.day) ||
                                     (formik.touched.month && formik.errors.month) ||
@@ -331,9 +346,9 @@ const Setting = () => {
                             onClick={formik.handleSubmit}
                             loading={loading}
                             disabled={loading}
-
+                            className="w-full"
                         >
-                            Xác nhận
+                            Thay đổi
                         </Button>
                     </div>
                 </div>
@@ -345,11 +360,11 @@ const Setting = () => {
             children: (
                 <>
                     <div className="flex items-center justify-center   p-4">
-                        <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-gray-200 p-6 md:p-8">
-                            <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Đổi Mật Khẩu</h2>
+                        <div className="w-full max-w-md bg-white rounded-2xl   p-6 md:p-8">
+
 
                             <form className="space-y-6">
-                                {/* Mật khẩu cũ */}
+
                                 <div>
                                     <label htmlFor="oldPassword" className="block text-sm font-medium text-gray-700 mb-1">
                                         Mật khẩu cũ
@@ -387,7 +402,7 @@ const Setting = () => {
                                         disabled={(!oldpassword && !newpassword)}
                                         className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium py-3 rounded-lg shadow-md transition duration-200"
                                     >
-                                        Xác nhận
+                                        Thay đổi
                                     </Button>
                                 </div>
                             </form>
@@ -413,12 +428,12 @@ const Setting = () => {
 
     return (
         <>
-            <div className="flex items-center justify-center min-h-full bg-gray-100 py-40">
+            <div className="w-full justify-center max-w-4xl mx-auto my-2 md:my-4 px-2 md:px-4 pt-5 ">
                 <motion.div
                     initial="hidden"
                     animate="visible"
                     variants={containerVariants}
-                    className="w-full  p-6 md:p-8 bg-white rounded-3xl shadow-2xl border border-gray-200"
+                    className="w-full  p-6 md:p-8 bg-white rounded-3xl shadow-2xl border border-gray-200 "
                 >
                     <h1 className='text-left text-2xl mb-2 '>Cài đặt tài khoản</h1>
                     <Tabs
@@ -428,7 +443,7 @@ const Setting = () => {
                         items={items}
                         animated={true}
                         onChange={handlecReset}
-                        className="min-h-[300px] bg-transparent"
+                        className="min-h-[75vh] bg-transparent"
                         tabBarStyle={{ borderRight: 'none' }}
                         tabBarGutter={32}
                     />

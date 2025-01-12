@@ -9,6 +9,22 @@ export const handleloginAdmin = (data) => {
 export const handleadminprofile = () => {
     return axios.get('/admin/auth/profile')
 }
+export const handleLogoutAdmin = () => {
+    return axios.post('/admin/auth/logout');
+}
+export const handleDashboard = () => {
+    return axios.get('/admin/dashboard/data')
+}
+
+
+export const handleAllUser = () => {
+    return axios.get('/admin/dashboard/user')
+}
+
+
+export const handlePostAnalys = () => {
+    return axios.get('/admin/dashboard/post')
+}
 
 // management user
 export const handleGetAllUser = () => {

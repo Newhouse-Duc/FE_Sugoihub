@@ -166,6 +166,7 @@ const AdminPost = () => {
         {
             title: "Thao tác",
             key: "action",
+            fixed: 'right',
             render: (text, record) => (
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <Button type="primary" size="small" onClick={() => handleViewPost(record)}><i className="bi bi-eye"></i></Button>
@@ -198,10 +199,13 @@ const AdminPost = () => {
                     showSizeChanger: true,
                     pageSizeOptions: ['5', '10', '15'],
                 }}
+                scroll={{ x: 'max-content' }}  // Thêm cuộn ngang và cuộn dọc nếu cần
+
+                rowKey={(record) => record._id}
                 onChange={handleTableChange}
 
             />
-            <Postdetail isOpen={postdetail} onClose={() => handleClosePostDetail()} post={selectedPost} />
+            <Postdetail isOpen={postdetail} scroll={{ x: 1200 }} onClose={() => handleClosePostDetail()} post={selectedPost} />
         </>
     )
 }

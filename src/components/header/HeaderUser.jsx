@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import Notifications from '../notification/Notifications';
 import { allNotification } from '../../redux/Notification/Notification.thunk';
 import ToastContainer from '../notification/ToastNotification';
+import logo from '../../assets/logo/Logo_SugoiHub.png'
 const HeaderUser = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -37,7 +38,7 @@ const HeaderUser = () => {
 
     const navigationItems = [
         { icon: "bi-house-heart-fill", label: "Trang chủ", link: "/home" },
-        { icon: "bi-people-fill", label: "Bạn bè", link: "/request" },
+
         { icon: "bi-person-plus-fill", label: "Lời mời", link: "/friendrequest" },
         { icon: "bi-chat-dots-fill", label: "Tin nhắn", link: "/messages" }
     ];
@@ -74,7 +75,7 @@ const HeaderUser = () => {
             <div className="navbar   bg-[#97A1F0] px-4 shadow-md fixed top-0 w-full z-50">
                 {/* Logo và Tìm kiếm */}
                 <div className="navbar-start flex items-center gap-4">
-                    <Link to="/home" className="text-2xl font-bold text-primary hidden md:flex">MySocial</Link>
+                    <Link to="/home" className="text-2xl font-bold text-primary hidden md:flex"><img src={logo} className=' h-12 w-12' /></Link>
                     <div className="hidden lg:flex relative items-center" ref={searchRef}>
                         <input
                             type="text"
@@ -160,7 +161,7 @@ const HeaderUser = () => {
                                     Cài đặt
                                 </a>
                             </li>
-                            <li>
+                            {/* <li>
                                 <button className="flex gap-2 ">
                                     <label className="swap swap-rotate btn btn-ghost btn-circle">
                                         <input type="checkbox" />
@@ -172,7 +173,7 @@ const HeaderUser = () => {
                                     </label>
 
                                 </button>
-                            </li>
+                            </li> */}
                             <div className="divider my-1"></div>
                             <li>
                                 <button onClick={handleLogout} className="flex gap-2 text-error">

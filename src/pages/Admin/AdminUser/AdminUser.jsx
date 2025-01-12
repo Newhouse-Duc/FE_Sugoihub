@@ -81,6 +81,7 @@ const AdminUser = () => {
         {
             title: "Thao tác",
             key: "action",
+            fixed: 'right',
             render: (text, record) => (
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <Button type="primary" size="small"><i className="bi bi-eye"></i></Button>
@@ -113,8 +114,8 @@ const AdminUser = () => {
 
     return (
         <>
-            <div>
-                <Table columns={columns} loading={loading} dataSource={data} />
+            <div className='p-4 bg-white rounded-lg shadow-lg'>
+                <Table columns={columns} scroll={{ x: 1200 }} loading={loading} dataSource={data} />
             </div>
 
 
