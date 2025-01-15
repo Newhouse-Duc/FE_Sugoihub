@@ -11,10 +11,10 @@ import { BsPersonCheck } from "react-icons/bs";
 import { IoNotificationsCircleOutline } from "react-icons/io5";
 import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineNotificationsActive } from "react-icons/md";
-import { Dropdown, Space, message } from 'antd';
+import { Dropdown, Space, message, Avatar } from 'antd';
 import { markNotificationsAsReadOptimistic, removeNotification } from "../../redux/Notification/Notification.slice"
 import { maskReadNotifications } from "../../redux/Notification/Notification.thunk"
-
+import { UserOutlined, MailOutlined, LinkOutlined } from '@ant-design/icons';
 import { allNotification, deleteNotification } from '../../redux/Notification/Notification.thunk';
 
 const Notifications = () => {
@@ -183,11 +183,13 @@ const Notifications = () => {
                                 }`}
                         >
                             <div className="relative flex-shrink-0">
-                                <img
-                                    src={notification.sender.avatar.url || '/default-avatar.png'}
-                                    alt={`${notification.sender.username}'s avatar`}
+                                <Avatar
+                                    size={50}
+                                    src={notification.sender.avatar.url}
+                                    icon={<UserOutlined />}
                                     className="w-12 h-12 rounded-full object-cover ring-2 ring-white dark:ring-gray-700 shadow-sm group-hover:ring-blue-200 dark:group-hover:ring-gray-600 transition-all"
                                 />
+
                                 <div className="absolute -right-1 -bottom-1">
                                     <div className="p-1 bg-white dark:bg-gray-800 rounded-full">
                                         {renderIcon(notification.type)}
@@ -209,7 +211,7 @@ const Notifications = () => {
                                 </div>
                             </div>
 
-                            {/* Chấm đỏ isRead */}
+
                             {!notification.isRead && (
                                 <div className="absolute right-4 top-10">
                                     <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></div>
@@ -237,7 +239,12 @@ const Notifications = () => {
                     ))}
                 </ul>
             </div>
+            <div>{allnotification.length === 0 && (
+                <div className="flex items-center justify-center  text-white text-lg font-semibold rounded-lg shadow-md transition transform hover:scale-105">
+                    Chưa có thông báo nào
+                </div>
 
+            )}</div>
             <div className="sticky bottom-0 z-10 bg-white dark:bg-gray-800 p-4 border-t border-gray-200 dark:border-gray-700">
                 <a
                     onClick={handlLoadMoreNotification}

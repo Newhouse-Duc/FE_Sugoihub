@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { handleGetConservation, handleGetMessageChat, handleUploadImageChat, handleCreateConservation, voicechat } from '../../services/user'
+import { handleGetConservation, handleGetMessageChat, handleUploadImageChat, handleCreateConservation, voicechat, handleDeleteConversation } from '../../services/user'
 
 
 
@@ -48,7 +48,16 @@ export const createConservation = createAsyncThunk(
 )
 
 
-
+export const deleteConversation = createAsyncThunk(
+    'chat/ delete conversation',
+    async ({ id }, { rejectWithValue }) => {
+        try {
+            return await handleDeleteConversation(id)
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+)
 export const voice = createAsyncThunk(
     'chat/voice',
     async ({ data }, { rejectWithValue }) => {

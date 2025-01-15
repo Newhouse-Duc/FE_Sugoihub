@@ -112,7 +112,7 @@ const CreatePost = ({ isOpen, onClose }) => {
     const handleChangeVideo = ({ fileList: newFileListVideo }) => {
         const isLtMaxSize = newFileListVideo.every(file => {
             if (file.originFileObj) {
-                return file.originFileObj.size / 1024 / 1024 < 20; // Giới hạn 20MB
+                return file.originFileObj.size / 1024 / 1024 < 20;
             }
             return true;
         });
@@ -147,7 +147,7 @@ const CreatePost = ({ isOpen, onClose }) => {
         if (!isLt20M) {
             message.error('Video phải nhỏ hơn 20MB!');
         }
-        return false; // return false để không tự động upload
+        return false;
     };
     useEffect(() => {
         return () => {
@@ -184,7 +184,7 @@ const CreatePost = ({ isOpen, onClose }) => {
         <>
             <Modal
                 title="Bài đăng mới"
-                centered
+
 
                 closeIcon={false}
                 open={isOpen}
@@ -344,9 +344,10 @@ const CreatePost = ({ isOpen, onClose }) => {
             </Modal>
             <Modal
                 title="Xác nhận hủy bài đăng"
-                centered
+
                 open={isCancelConfirmVisible}
                 onCancel={closeConfirmModal}
+
                 footer={[
                     <Button key="no" onClick={closeConfirmModal}>
                         Không

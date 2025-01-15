@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import Post from './Post';
 import CommentPost from '../modals/CommentPost';
 import ViewPost from '../modals/ViewPost';
+import { motion } from "framer-motion";
+import { useInView } from "react-intersection-observer";
 
 const PostList = ({ allpost }) => {
     const dispatch = useDispatch();
@@ -12,6 +14,14 @@ const PostList = ({ allpost }) => {
     const [modalcommentpost, setModalCommentPost] = useState(false);
     const loadingpost = useSelector((state) => state.post.loadingpost);
     const validPosts = allpost?.filter((post) => post && post.user);
+
+    // Variants cho animation
+    const postVariants = {
+
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+        hover: { scale: 1.02, boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.2)" },
+
+    };
 
     const handleOpenComment = (post) => {
         setSelectedPost(post);
@@ -31,6 +41,31 @@ const PostList = ({ allpost }) => {
     const handleOpenViewPost = (post) => {
         setViewPost(post);
         setModalViewPost(true);
+    };
+
+    // Single Post component that uses InView
+    const PostWithInView = ({ post, index }) => {
+        const [ref, inView] = useInView({
+            triggerOnce: true,
+            threshold: 0.1
+        });
+
+        return (
+            <motion.div
+            // ref={ref}
+            // variants={postVariants}
+            // initial="hidden"
+            // animate={inView ? "visible" : "hidden"}
+
+            // transition={{ delay: index * 0.1, type: "spring", stiffness: 100 }}
+            >
+                <Post
+                    post={post}
+                    onCommentClick={handleOpenComment}
+                    onViewPostClick={handleOpenViewPost}
+                />
+            </motion.div>
+        );
     };
 
     return (
@@ -71,9 +106,8 @@ const PostList = ({ allpost }) => {
                             </div>
                         </div>
                     ) : validPosts?.length > 0 ? (
-                        validPosts.map((post) => (
+                        validPosts.map((post, index) => (
                             <Post
-                                key={post._id}
                                 post={post}
                                 onCommentClick={handleOpenComment}
                                 onViewPostClick={handleOpenViewPost}

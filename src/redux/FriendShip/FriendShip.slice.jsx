@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addFriend, allfriendship, updateFriend } from "./FriendShip.thunk";
+import { addFriend, allfriendship, updateFriend, deleteFriend, listfriend } from "./FriendShip.thunk";
+
 import { message } from "antd"
 const initialState = {
 
@@ -16,6 +17,7 @@ export const friendship = createSlice({
     name: 'friendship',
     initialState,
     reducers: {
+
     },
     extraReducers: (builder) => {
         builder
@@ -64,9 +66,36 @@ export const friendship = createSlice({
 
             })
 
+            //dlelte friend
+            .addCase(deleteFriend.pending, (state) => {
+                state.loading = true
+            })
+            .addCase(deleteFriend.fulfilled, (state, action) => {
+                state.loading = false
+                message.success(action.payload.message)
+            })
+            .addCase(deleteFriend.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.error.message
 
+            })
 
+            // list friend 
+            .addCase(listfriend.pending, (state) => {
+                state.loading = true
+            })
+            .addCase(listfriend.fulfilled, (state, action) => {
+                state.loading = false
+                if (action.payload.success) {
+                    state.friends = action.payload.data
 
+                }
+
+            })
+            .addCase(listfriend.rejected, (state, action) => {
+                state.loading = false
+                message.error(action.payload.message)
+            })
 
     },
 })

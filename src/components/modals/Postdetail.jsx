@@ -1,43 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Modal, message, Upload, Image, Input, Avatar, Carousel } from 'antd';
-import { allCommentByPost, likeComment } from '../../redux/Comment/Comment.thunk';
 
+import { allcommentbypost } from '../../redux/Admin/Admin_post/Admin_post.thunk';
 
 import { formatDistance } from 'date-fns';
-import { getReplyComment } from '../../redux/Comment/Comment.thunk';
+
 
 import { vi } from 'date-fns/locale';
 import { ThumbsUp, MessageSquare, Share2, MoreHorizontal } from 'lucide-react';
-import LazyNestedComments from '../NestedComments/LazyNestedComments';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Parallax, FreeMode, EffectFade } from 'swiper/modules';
+
 
 const Postdetail = ({ isOpen, onClose, post }) => {
 
     const dispatch = useDispatch()
-
-
-    const replyComment = useSelector((state) => state.comment.replyComment)
-
-
-    const comment = useSelector((state) => state.comment.comment)
-    const formatDate = (date) => {
-        return formatDistance(new Date(date), new Date(), {
-            addSuffix: true,
-            locale: vi
-        });
-    };
+    const comment = useSelector((state) => state.adminpost.comment)
+    const videoRef = useRef(null);
     useEffect(() => {
-        console.log("xem post đc gì ", post)
+
         if (post) {
-            dispatch(allCommentByPost({ id: post._id }))
+            dispatch(allcommentbypost({ id: post._id }))
         }
 
     }, [post])
-
-
-
-
-
+    const stopVideo = () => {
+        if (videoRef.current) {
+            videoRef.current.pause();
+            videoRef.current.currentTime = 0;
+        }
+    };
+    useEffect(() => {
+        if (!isOpen) {
+            stopVideo();
+        }
+    }, [isOpen]);
     return (
         <>
             <Modal
@@ -83,22 +81,68 @@ const Postdetail = ({ isOpen, onClose, post }) => {
                     {/* Post Content */}
                     <div className="mt-4">
                         {/* Nội dung bài viết */}
-                        <p className="text-gray-800 mb-4">{post?.content || "Không có nội dung."}</p>
+                        <p className="text-gray-800 mb-4">{post?.content}</p>
 
-                        {/* Carousel hiển thị ảnh nếu có */}
-                        {post?.images?.length > 0 && (
-                            <Carousel dots className="rounded-lg overflow-hidden">
-                                {post.images.map((image, index) => (
-                                    <div key={index} className="h-64 md:h-96">
-                                        <img
+                        <Swiper
+                            modules={[Navigation, Pagination, Parallax, FreeMode, EffectFade]}
+                            effect="slide"
+                            speed={500}
+                            freeMode={true}
+                            spaceBetween={10}
+                            slidesPerView={2}
+                            centeredSlides={true}
+                            initialSlide={0}
+                            slideToClickedSlide={false}
+                            pagination={{ clickable: true }}
+
+
+                        >
+                            <div
+                                slot="container-start"
+                                className="parallax-bg "
+                                data-swiper-parallax="-23%"
+
+                            ></div>
+                            {post?.images?.map((image, index) => (
+                                <SwiperSlide key={`image-${index}`}>
+                                    <div className="title w-auto h-auto mx-auto " data-swiper-parallax="-300">
+                                        <Image
                                             src={image.url}
-                                            alt={`Post image ${index + 1}`}
-                                            className="w-full h-full object-cover"
+                                            alt={`Slide ${index}`}
+                                            style={{
+                                                width: "100%",
+                                                height: "100%",
+                                                margin: '0 auto',
+                                                borderRadius: '8px',
+
+
+                                            }}
+                                            className="object-cover aspect-square"
                                         />
                                     </div>
-                                ))}
-                            </Carousel>
-                        )}
+                                </SwiperSlide>
+                            ))}
+                            {post?.videos?.map((video, index) => (
+                                <SwiperSlide key={`video-${index}`}>
+                                    <div className="title w-auto h-auto mx-auto" data-swiper-parallax="-300">
+                                        <video
+                                            ref={videoRef}
+                                            controls
+                                            style={{
+                                                width: '100%',
+
+                                                height: '100%',
+
+                                            }}
+                                            className=" aspect-square"
+                                        >
+                                            <source src={video.url} type="video/mp4" />
+
+                                        </video>
+                                    </div>
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
                     </div>
 
 
@@ -158,6 +202,18 @@ const Postdetail = ({ isOpen, onClose, post }) => {
                                                     {commentItem?.author?.username}
                                                 </div>
                                                 <div className="text-sm text-gray-600">{commentItem?.content}</div>
+                                                {commentItem.images?.length > 0 && (
+                                                    <div className="mt-3 grid gap-2 grid-cols-2">
+                                                        {commentItem.images.map((image, index1) => (
+                                                            <img
+                                                                key={index1}
+                                                                src={image.url}
+                                                                alt={`Comment ${index1 + 1}`}
+                                                                className="rounded-lg object-cover w-full h-32"
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     ))}

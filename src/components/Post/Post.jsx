@@ -1,20 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Image, message } from "antd";
 import { useDispatch, useSelector } from 'react-redux';
 import ActionPost from './ActionPost';
-import { likePost } from '../../redux/Post/Post.thunk';
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Parallax, FreeMode, EffectFade } from 'swiper/modules';
 import { formatDistance } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { Dropdown, Modal, Button, Skeleton, Card } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import EditPost from '../modals/EditPost';
 import { deletePost } from '../../redux/Post/Post.thunk';
+import HistoryEditPost from '../modals/HistoryEditPost';
 
 const Post = ({ post, onCommentClick, onViewPostClick }) => {
     const [modalDelete, setModalDelete] = useState(false);
     const dispatch = useDispatch()
+    const videoRef = useRef(null);
     const [editModal, setEditModal] = useState(false)
-
+    const [historymodal, setHistoryModal] = useState(false)
     const userinfor = useSelector((state) => state.auth.userinfor)
     if (!post || !post.user) {
         return <p className="text-gray-500 text-center">Bài viết này không hợp lệ.</p>;
@@ -28,7 +32,7 @@ const Post = ({ post, onCommentClick, onViewPostClick }) => {
     };
 
     const handleSubmitDelete = async (post) => {
-        console.log("xem giá trị thửhahaha: ", post)
+
         const res = await dispatch(deletePost({ id: post._id })).unwrap();
         if (res.success) {
             message.success("Đã xóa bài viết thành công.");
@@ -46,21 +50,16 @@ const Post = ({ post, onCommentClick, onViewPostClick }) => {
         },
         {
             key: '3',
-            label: <div><i className="bi bi-exclamation-octagon"></i> Báo cáo bài viết</div>,
+            label: <div onClick={() => setHistoryModal(true)}><i class="bi bi-clock-history"></i> Lịch sử chỉnh sửa</div>,
         },
-        {
-            key: '4',
-            label: <div><i className="bi bi-share"></i> Chia sẻ bài viết</div>,
-        },
-        {
-            key: '5',
-            label: <div><i className="bi bi-bookmark"></i> Lưu bài viết</div>,
-        },
-        {
-            key: '6',
-            label: <div><i className="bi bi-eye-slash"></i> Ẩn bài viết</div>,
-        }
+
     ].filter(Boolean);
+    const stopVideo = () => {
+        if (videoRef.current) {
+            videoRef.current.pause();
+            videoRef.current.currentTime = 0;
+        }
+    };
 
     return (
         <>
@@ -118,61 +117,68 @@ const Post = ({ post, onCommentClick, onViewPostClick }) => {
 
                 {/* Content */}
                 <div className="mb-4 cursor-pointer" onClick={() => onViewPostClick(post)}>
-                    <p className="text-gray-800 mb-4">{post.content || "Không có nội dung."}</p>
-                    {post.images?.length > 0 && (
-                        <div className="grid gap-4">
-                            {/* Trường hợp 1 ảnh */}
-                            {post.images.length === 1 && (
-                                <div className="flex justify-center">
+                    <p className="text-gray-800 mb-4">{post.content}</p>
+                    <Swiper
+                        modules={[Navigation, Pagination, Parallax, FreeMode, EffectFade]}
+                        effect="slide"
+                        speed={500}
+                        freeMode={true}
+                        spaceBetween={10}
+                        slidesPerView={2}
+                        centeredSlides={true}
+                        initialSlide={0}
+                        slideToClickedSlide={false}
+                        pagination={{ clickable: true }}
 
 
+                    >
+                        <div
+                            slot="container-start"
+                            className="parallax-bg "
+                            data-swiper-parallax="-23%"
+
+                        ></div>
+                        {post?.images?.map((image, index) => (
+                            <SwiperSlide key={`image-${index}`}>
+                                <div className="title w-auto h-auto mx-auto " data-swiper-parallax="-300">
                                     <img
+                                        src={image.url}
+                                        alt={`Slide ${index}`}
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            margin: '0 auto',
+                                            borderRadius: '8px',
 
-                                        getContainer={false}
-                                        src={post.images[0].url}
-                                        className="aspect-square w-64 object-cover rounded-lg" />
+
+                                        }}
+                                        className="object-cover aspect-square"
+                                    />
                                 </div>
-                            )}
+                            </SwiperSlide>
+                        ))}
+                        {post?.videos?.map((video, index) => (
+                            <SwiperSlide key={`video-${index}`}>
+                                <div className="title w-auto h-auto mx-auto" data-swiper-parallax="-300">
+                                    <video
+                                        ref={videoRef}
 
-                            {/* Trường hợp 2 ảnh */}
-                            {post.images.length === 2 && (
-                                <div className="grid grid-cols-2 gap-4">
-                                    {post.images.map((image) => (
+                                        style={{
+                                            width: '100%',
 
-                                        <img
-                                            key={image.publicId}
-                                            getContainer={false}
-                                            src={image.url}
-                                            className="aspect-square w-full object-cover rounded-lg" />
-                                    ))}
+                                            height: '100%',
+
+                                        }}
+                                        className=" aspect-square"
+                                    >
+                                        <source src={video.url} type="video/mp4" />
+
+                                    </video>
                                 </div>
-                            )}
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
 
-
-                            {post.images.length === 3 && (
-                                <div className="grid grid-cols-3 gap-4">
-                                    <div className="col-span-2">
-
-                                        <img
-                                            key={post.images[0].publicId}
-                                            getContainer={false}
-                                            src={post.images[0].url}
-                                            className="aspect-square w-full h-full object-cover rounded-lg" />
-                                    </div>
-                                    <div className="grid grid-rows-2 gap-4">
-                                        {post.images.slice(1).map((image) => (
-                                            <img
-                                                key={image.publicId}
-                                                getContainer={false}
-                                                src={image.url}
-                                                className="aspect-square w-full object-cover rounded-lg" />
-
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
 
 
 
@@ -210,6 +216,7 @@ const Post = ({ post, onCommentClick, onViewPostClick }) => {
                     </div>
                 </Modal>
                 <EditPost open={editModal} onClose={() => setEditModal(false)} post={post} />
+                <HistoryEditPost open={historymodal} onClose={() => setHistoryModal(false)} post={post} />
 
             </div >
 

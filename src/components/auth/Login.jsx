@@ -63,9 +63,7 @@ const Login = () => {
                         <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                             Đăng nhập
                         </h1>
-                        <p className="text-sm text-gray-600 mt-2">
-                            Đăng nhập để truy cập tài khoản của bạn
-                        </p>
+
                     </motion.div>
 
                     <form className="space-y-6" onSubmit={formik.handleSubmit}>

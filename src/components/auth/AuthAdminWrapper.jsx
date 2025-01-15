@@ -15,10 +15,13 @@ const AuthAdminWrapper = ({ children }) => {
         try {
             if (!isAdminAuthenticated || !admininfor) {
                 await dispatch(adminprofile()).unwrap();
+
             }
         } catch (error) {
-            console.error("Lỗi xác thực admin:", error);
-            navigate("/admin");
+            if (error?.response?.status === 401) {
+
+                navigate("/admin");
+            }
         } finally {
             setIsInitialized(true);
         }

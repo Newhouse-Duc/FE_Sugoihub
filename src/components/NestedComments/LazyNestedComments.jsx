@@ -104,10 +104,7 @@ const CommentItem = ({
                             <span>{comment.replyCount || 0}</span>
                         </button>
 
-                        <button className="flex items-center text-gray-500 hover:text-blue-600">
-                            <Share2 className="w-4 h-4 mr-1" />
-                            <span>Chia sẻ</span>
-                        </button>
+
 
                         {comment.replyCount > 0 && (
                             <button

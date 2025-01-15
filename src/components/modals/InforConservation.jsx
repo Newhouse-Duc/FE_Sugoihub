@@ -5,7 +5,8 @@ import { AntDesignOutlined, UserOutlined } from '@ant-design/icons';
 import { AiFillPicture, AiOutlineUser } from "react-icons/ai";
 import { MdOutlineGroupAdd, MdDeleteForever } from "react-icons/md";
 import { useSocket } from '../../socket/SocketContext';
-import { uploadImageChat } from '../../redux/Chat/Chat.thunk';
+import { uploadImageChat, deleteConversation } from '../../redux/Chat/Chat.thunk';
+
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -26,7 +27,7 @@ const InforConservation = ({ isOpen, onClose, group }) => {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const userinfor = useSelector((state) => state.auth.userinfor)
-    const listFriend = useSelector((state) => state.auth.listFriend)
+    const friends = useSelector((state) => state.friendship.friends)
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
@@ -80,16 +81,21 @@ const InforConservation = ({ isOpen, onClose, group }) => {
             socket.emit("updategroupchat", updateData);
 
             setLoading(false);
-            message.success("yes");
+            message.success("Thay đổi thành công");
 
         } catch (error) {
             setLoading(false);
             message.error("Có lỗi xảy ra: " + error.message);
         }
     };
-    const handleComfirmDelete = () => {
+    const handleComfirmDelete = async (id) => {
+        console.log("xem id có không: ", id)
+        const res = await dispatch(deleteConversation({ id })).unwrap()
+        if (res.success) {
+            onClose()
+            message.success("Xóa nhóm thành công")
+        }
 
-        message.success("Xóa nhóm thành công")
     }
     const handleChangeAdmin = (value) => {
 
@@ -243,7 +249,7 @@ const InforConservation = ({ isOpen, onClose, group }) => {
                                             description="Bạn có chắc chắn xóa không lưu ý sẽ không thể hoàn tác"
                                             okText="Đồng ý"
                                             cancelText="Hủy bỏ"
-                                            onConfirm={handleComfirmDelete}
+                                            onConfirm={() => handleComfirmDelete(group.conversationId)}
                                         >
                                             <Button className="w-full md:w-auto bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 active:bg-red-700 transition duration-200 shadow">
                                                 <MdDeleteForever /> Xóa nhóm
@@ -279,7 +285,7 @@ const InforConservation = ({ isOpen, onClose, group }) => {
                                         .includes(input.toLowerCase())
                                 }
                             >
-                                {listFriend.map((friend) => (
+                                {friends.map((friend) => (
                                     <Select.Option key={friend._id} value={friend._id}>
                                         <div className="flex items-center gap-3">
                                             <div className="flex-shrink-0">

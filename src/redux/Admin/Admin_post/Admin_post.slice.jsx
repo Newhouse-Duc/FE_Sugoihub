@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllPost, deletePost, hidePost } from "./Admin_post.thunk";
+import { getAllPost, deletePost, hidePost, allcommentbypost } from "./Admin_post.thunk";
 import { message } from 'antd'
 const initialState = {
 
@@ -11,6 +11,7 @@ const initialState = {
     },
     loading: false,
     error: null,
+    comment: []
 
 
 }
@@ -75,6 +76,20 @@ export const admin_post = createSlice({
                 message.success(action.payload.message)
             })
             .addCase(hidePost.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.error.message
+            })
+
+            // all comment
+            .addCase(allcommentbypost.pending, (state) => {
+                state.loading = true
+            })
+            .addCase(allcommentbypost.fulfilled, (state, action) => {
+                state.loading = false
+                state.comment = action.payload.data
+
+            })
+            .addCase(allcommentbypost.rejected, (state, action) => {
                 state.loading = false
                 state.error = action.error.message
             })

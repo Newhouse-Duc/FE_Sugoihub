@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { message } from 'antd';
-import { changepassword, logoutadmin, login, register, verifyotp, userprofile, refreshtoken, logoutuser, sendotp, listUser, forgotPassword, verifyOtpResetPassword, resetPassword, updateprofileuser, listfriend }
+import { changepassword, logoutadmin, login, register, verifyotp, userprofile, refreshtoken, logoutuser, sendotp, listUser, forgotPassword, verifyOtpResetPassword, resetPassword, updateprofileuser }
     from './Auth.thunk';
 import { loginAdmin, adminprofile } from './Auth.thunk';
 
@@ -29,7 +29,13 @@ export const authSlice = createSlice({
 
         setEmail: (state, action) => {
             state.emailverify = action.payload;
-        }
+        },
+        removeFriend: (state, action) => {
+            const idToRemove = action.payload;
+            state.userinfor.friends = state.userinfor.friends.filter(
+                friendId => friendId !== idToRemove
+            );
+        },
 
     },
     extraReducers: (builder) => {
@@ -320,21 +326,8 @@ export const authSlice = createSlice({
                 state.isLoading = false
                 message.error(action.payload.message)
             })
-            // list friend 
 
-            .addCase(listfriend.fulfilled, (state, action) => {
-
-                if (action.payload.success) {
-                    state.listFriend = action.payload.data
-
-                }
-
-            })
-            .addCase(listfriend.rejected, (state, action) => {
-                state.isLoading = false
-                message.error(action.payload.message)
-            })
     },
 })
-export const { setView, setEmail } = authSlice.actions;
+export const { setView, setEmail, removeFriend } = authSlice.actions;
 export default authSlice.reducer

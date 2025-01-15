@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getConservationId, getMessageChat, createConservation, voice } from "./Chat.thunk";
+import { getConservationId, getMessageChat, createConservation, voice, deleteConversation } from "./Chat.thunk";
 
 const initialState = {
 
@@ -19,7 +19,9 @@ export const chat = createSlice({
             state.chats.push(action.payload);
         },
         deleteMessage: (state, action) => {
-            const messageId = action.payload;
+            const messageId = action.payload.messageId;
+
+            console.log("xem adada", action.payload.messageId)
             state.chats = state.chats.filter((message) => message._id !== messageId);
         },
         updateMessageStatus: (state, action) => {
@@ -33,7 +35,26 @@ export const chat = createSlice({
 
                 }
             }
-        }
+        },
+        updatelistchat: (state, action) => {
+            const { data } = action.payload
+            console.log("xem pay;pad", action.payload)
+            console.log("xem data", data)
+
+
+            const conversationIndex = state.conversation.findIndex(
+                conv => conv.conversationId === data.conversationId
+            );
+
+            if (conversationIndex !== -1) {
+
+                state.conversation[conversationIndex] = {
+                    ...state.conversation[conversationIndex],
+                    groupName: data.groupName
+                };
+            }
+
+        },
     },
 
     extraReducers: (builder) => {
@@ -97,7 +118,24 @@ export const chat = createSlice({
                 state.error = action.error.message
 
             })
+
+            //delete conversation
+            .addCase(deleteConversation.pending, (state) => {
+                state.loading = true
+            })
+            .addCase(deleteConversation.fulfilled, (state, action) => {
+                state.loading = false
+                state.conversation = state.conversation.filter(
+                    conv => conv.conversationId !== action.payload.data._id
+                );
+
+            })
+            .addCase(deleteConversation.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.error.message
+
+            })
     },
 })
-export const { addMessage, deleteMessage, updateMessageStatus } = chat.actions;
+export const { addMessage, deleteMessage, updateMessageStatus, updatelistchat } = chat.actions;
 export default chat.reducer

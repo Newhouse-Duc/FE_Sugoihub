@@ -3,7 +3,7 @@ import { Button, Modal, message, Input, Select, Upload, Image, Popover, Avatar }
 import { AiFillPicture, AiOutlineUser } from "react-icons/ai";
 import { createConservation } from '../../redux/Chat/Chat.thunk';
 import { useDispatch, useSelector } from 'react-redux';
-import { listfriend } from '../../redux/Auth/Auth.thunk';
+import { listfriend } from '../../redux/FriendShip/FriendShip.thunk';
 
 
 const getBase64 = (file) =>
@@ -23,7 +23,7 @@ const CreateGroupChat = ({ isOpen, onClose }) => {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const userinfor = useSelector((state) => state.auth.userinfor)
-    const listFriend = useSelector((state) => state.auth.listFriend)
+    const friends = useSelector((state) => state.friendship.friends)
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
@@ -164,7 +164,7 @@ const CreateGroupChat = ({ isOpen, onClose }) => {
                                 .includes(input.toLowerCase())
                         }
                     >
-                        {listFriend.map((friend) => (
+                        {friends.map((friend) => (
                             <Select.Option key={friend._id} value={friend._id}>
                                 <div className="flex items-center gap-3 ">
                                     <div className="flex-shrink-0">

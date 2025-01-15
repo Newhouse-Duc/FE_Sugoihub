@@ -45,27 +45,6 @@ const processQueue = (error, token = null) => {
 };
 
 
-// Thêm interceptor response
-// axiosInstance.interceptors.response.use(
-//     (response) => response.data,
-//     (error) => {
-//         if (error.response) {
-//             console.error(
-//                 "Response error:",
-//                 error.response.status,
-//                 error.response.data
-//             );
-//             if (error.response.status = 401) {
-//                 handlerefreshtoken();
-//             }
-//         } else if (error.request) {
-//             console.error("Request error:", error.request);
-//         } else {
-//             console.error("Error:", error.message);
-//         }
-//         return Promise.reject(error);
-//     }
-// );
 
 
 

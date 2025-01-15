@@ -80,7 +80,13 @@ export const handleAllFriendShip = (id) => {
 
 
 export const handleUpdateFriendShip = (data) => {
+
     return axios.put("/friend/updatefriend", data)
+}
+
+export const handleDeleteFriend = (data) => {
+    console.log("daaa dâu r ", data)
+    return axios.delete("/friend/remove", { data })
 }
 
 
@@ -135,6 +141,9 @@ export const voicechat = (data) => {
     return axios.post("/chat/voice", data)
 }
 
+export const handleDeleteConversation = (id) => {
+    return axios.delete(`/chat/conversation/${id}`)
+}
 
 // comment 
 

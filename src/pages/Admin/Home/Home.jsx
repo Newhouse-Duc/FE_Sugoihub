@@ -178,11 +178,7 @@ const Home = () => {
                 >
                     <div className="text-slate-400 group-hover:text-violet-200 relative z-10 duration-300 flex items-center">Số bài viết mới ngày hôm nay {analyticsdata.countPostsToday}</div>
                 </DashboardCard>
-                <DashboardCard
-                    title="Báo cáo vi phạm"
-                    subtitle="10 báo cáo chưa xử lí "
-                    Icon={MdReportGmailerrorred}
-                />
+
             </div>
             <h1 className='text-xl font-bold mt-3'>Thống kê tài khoản người dùng</h1>
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-6">
@@ -210,65 +206,100 @@ const Home = () => {
             </div>
             <h1 className='text-xl font-bold mt-3'>Thống kê bài viết </h1>
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-6">
-
                 <div className="col-span-1 md:col-span-3 bg-white shadow-2xl rounded-lg p-6 card glass">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4">Thông số tương tác</h2>
-                    <div className="space-y-2">
-                        <div className="flex justify-between">
-                            <span className="text-gray-600">Trung bình lượt thích:</span>
+                    <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i className="bi bi-bar-chart-fill text-blue-500 mr-2"></i> Thông số tương tác
+                    </h2>
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center border-b pb-2">
+                            <span className="text-gray-600 flex items-center">
+                                <i className="bi bi-hand-thumbs-up-fill text-green-500 mr-2"></i> Trung bình lượt thích:
+                            </span>
                             <span className="font-medium text-gray-800">{dataPost?.stats?.avgLikes}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-gray-600">Trung bình bình luận:</span>
+                        <div className="flex justify-between items-center border-b pb-2">
+                            <span className="text-gray-600 flex items-center">
+                                <i className="bi bi-chat-dots-fill text-indigo-500 mr-2"></i> Trung bình bình luận:
+                            </span>
                             <span className="font-medium text-gray-800">{dataPost?.stats?.avgComments}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-gray-600">Tổng lượt thích:</span>
+                        <div className="flex justify-between items-center border-b pb-2">
+                            <span className="text-gray-600 flex items-center">
+                                <i className="bi bi-hand-thumbs-up text-yellow-500 mr-2"></i> Tổng lượt thích:
+                            </span>
                             <span className="font-medium text-gray-800">{dataPost?.stats?.totalLikes}</span>
                         </div>
-                        <div className="flex justify-between">
-                            <span className="text-gray-600">Tổng bình luận:</span>
+                        <div className="flex justify-between items-center">
+                            <span className="text-gray-600 flex items-center">
+                                <i className="bi bi-chat-dots text-red-500 mr-2"></i> Tổng bình luận:
+                            </span>
                             <span className="font-medium text-gray-800">{dataPost?.stats?.totalComments}</span>
                         </div>
                     </div>
                 </div>
 
 
+
                 <div className="col-span-1 md:col-span-2 bg-white shadow-2xl rounded-lg p-6">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">Bài viết tương tác nhiều nhất</h2>
+                    <div className="p-6 bg-white rounded-lg shadow-sm">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Bài viết tương tác nhiều nhất</h2>
 
-                    <div className="flex items-center space-x-4 mb-4">
-                        <Avatar
-                            src={dataPost?.topPosts.author.avatar?.url}
-                            icon={<FiUser />}
-                            className="w-12 h-12"
-                        />
-                        <div>
-                            <h1 className="text-gray-950 font-semibold">
-                                {dataPost?.topPosts.author?.username}
-                            </h1>
-                            <p className="text-sm text-gray-500">
-                                {new Date(dataPost?.topPosts.createdAt).toLocaleDateString()}
+                        <div className="space-y-6">
+                            {/* User info section */}
+                            <div className="flex items-center space-x-4">
+                                <Avatar
+                                    src={dataPost?.topPosts.author.avatar?.url}
+                                    icon={<FiUser />}
+                                    className="w-12 h-12 ring-2 ring-gray-100"
+                                />
+                                <div>
+                                    <h1 className="text-gray-900 font-semibold">
+                                        {dataPost?.topPosts.author?.username}
+                                    </h1>
+                                    <p className="text-sm text-gray-500">
+                                        {new Date(dataPost?.topPosts.createdAt).toLocaleDateString()}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Content section */}
+                            <p className="text-gray-700">
+                                {dataPost?.topPosts.content}
                             </p>
-                        </div>
-                    </div>
 
-                    <p className="text-gray-700 mb-4">
-                        {dataPost?.topPosts.content}
-                    </p>
+                            {/* Images section */}
+                            <div className="flex justify-center gap-4 overflow-x-auto py-3">
+                                {dataPost?.topPosts?.images?.map((image) => (
+                                    <div
+                                        key={image._id}
+                                        className="w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+                                    >
+                                        <img
+                                            src={image.url}
+                                            alt="Post content"
+                                            className="w-full h-full object-cover"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
 
-                    <div className="flex space-x-6 text-gray-600">
-                        <div className="flex items-center space-x-2">
-
-                            <span>{dataPost?.topPosts.likesCount}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-
-                            <span>{dataPost?.topPosts.commentsCount}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-
-                            <span>{dataPost?.topPosts.totalInteractions}</span>
+                            <div className="flex items-center space-x-6 text-gray-600 pt-2 border-t">
+                                <div className="flex items-center space-x-2">
+                                    <span className="text-gray-500">Tổng tương tác:</span>
+                                    <span className="font-medium">{dataPost?.topPosts.totalInteractions}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <span className="text-gray-500">Lượt thích:</span>
+                                    <i className="bi bi-heart-pulse text-red-500"></i>
+                                    <span className="font-medium">{dataPost?.topPosts.likesCount}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <span className="text-gray-500">Lượt bình luận:</span>
+                                    <i className="bi bi-chat-dots text-blue-600"></i>
+                                    <span className="font-medium">{dataPost?.topPosts.commentsCount}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

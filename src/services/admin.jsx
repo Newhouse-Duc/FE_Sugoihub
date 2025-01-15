@@ -48,3 +48,6 @@ export const handleHidePost = (id, hide) => {
 export const handleAdminDeletePost = (id) => {
     return axios.delete(`/admin/post/delete/${id}`)
 }
+export const handleGetAllCommentByPost = (id) => {
+    return axios.get(`/admin/post/allcomment/${id}`)
+}

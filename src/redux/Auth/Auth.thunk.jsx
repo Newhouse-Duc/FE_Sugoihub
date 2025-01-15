@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 
 import { message } from 'antd';
-import { handleUpdatePassword, handleUpdateProfile, handlelogin, handleregister, handleverifyotp, handleprofile, handlerefreshtoken, handleLogout, handleSendOTP, handleListUser, handleForgotPassword, handleVerifyOtpResetPassword, handleResetPassWord, handleGetFriend }
+import { handleUpdatePassword, handleUpdateProfile, handlelogin, handleregister, handleverifyotp, handleprofile, handlerefreshtoken, handleLogout, handleSendOTP, handleListUser, handleForgotPassword, handleVerifyOtpResetPassword, handleResetPassWord }
     from '../../services/user';
 import { handleloginAdmin, handleadminprofile, handleLogoutAdmin } from '../../services/admin';
 
@@ -190,16 +190,7 @@ export const updateprofileuser = createAsyncThunk(
 
 
 
-export const listfriend = createAsyncThunk(
-    'user/list friend',
-    async ({ id }, { rejectWithValue }) => {
-        try {
-            return await handleGetFriend(id);
-        } catch (error) {
-            return rejectWithValue(error.response.data);
-        }
-    }
-)
+
 
 export const changepassword = createAsyncThunk(
     "/user/change password",

@@ -18,18 +18,20 @@ const ActionPost = ({ post, onCommentClick }) => {
             postId: post._id
         }
         try {
-            const res = await dispatch(likePost({ data })).unwrap();
-            if (res.success && res.data.isLiked && post.user._id !== userinfor._id) {
-                message.success("Đã thích bài viết")
-                const newlike = {
-                    recipient: post.user._id,
-                    entityId: post._id,
-                    sender: userinfor._id,
-                    entityType: 'POST',
-                    type: "POST_LIKE",
-                    text: "đã thích bài viết của bạn"
-                };
-                socket.emit("likepost", newlike);
+            if (post.user._id !== userinfor._id) {
+                const res = await dispatch(likePost({ data })).unwrap();
+                if (res.success && res.data.isLiked) {
+                    message.success("Đã thích bài viết")
+                    const newlike = {
+                        recipient: post.user._id,
+                        entityId: post._id,
+                        sender: userinfor._id,
+                        entityType: 'POST',
+                        type: "POST_LIKE",
+                        text: "đã thích bài viết của bạn"
+                    };
+                    socket.emit("likepost", newlike);
+                }
             }
         } catch (error) {
             message.error("Đã xảy ra lỗi: ", error);
@@ -47,7 +49,7 @@ const ActionPost = ({ post, onCommentClick }) => {
 
     return (
         <>
-            <div className="flex items-center justify-between pt-4 px-2">
+            <div className="flex items-center  pt-4 px-2">
 
                 <label className="swap swap-rotate">
                     <input type="checkbox" checked={post.isLiked} onChange={() => handleLikePost(post)} />
@@ -69,12 +71,7 @@ const ActionPost = ({ post, onCommentClick }) => {
                     <span className="text-sm text-gray-600">{post.commentCount}</span>
                 </button>
 
-                {(post.user._id !== userinfor._id) &&
-                    <button className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                        <i className="bi bi-arrow-repeat text-gray-500 text-xl"></i>
-                        <span className="text-sm text-gray-600">Đăng lại</span>
-                    </button>
-                }
+
             </div>
         </>
     )

@@ -7,8 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { allPost } from '../../redux/Post/Post.thunk';
 import PostList from '../../components/Post/PostList';
 import { motion } from 'framer-motion';
+import Giphy from '../../components/giphy/Giphy';
 
-import { Search, Heart, User } from 'lucide-react';
 
 const Home = () => {
     const isMobile = useMediaQuery({ maxWidth: 768 });
@@ -23,14 +23,8 @@ const Home = () => {
             dispatch(allPost({ userId: userinfor._id }));
         }
     }, [userinfor, dispatch]);
-    const [selected, setSelected] = useState(0);
 
-    const navItems = [
 
-        { icon: Search, label: 'Search' },
-        { icon: Heart, label: 'Favorites' },
-        { icon: User, label: 'Profile' }
-    ];
 
 
 
@@ -77,13 +71,14 @@ const Home = () => {
                         <button onClick={() => dispatch(openModal('createPost'))} className="px-6 py-2.5 bg-[#00CDB8] hover:bg-[#00b5a2] text-white rounded-lg transition-colors duration-200 font-medium">
                             Đăng
                         </button>
+                        <CreatePost isOpen={createpost} onClose={() => setCreatePost(false)} />
                     </div>
                 </motion.div>
             </div>
 
 
 
-            <CreatePost isOpen={createpost} onClose={() => setCreatePost(false)} />
+
 
 
 

@@ -1,3 +1,9 @@
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
+@import 'swiper/css/scrollbar';
+@import 'swiper/css/effect-fade';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,7 +16,7 @@
   font-weight: 400;
 
   color-scheme: light dark;
- 
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

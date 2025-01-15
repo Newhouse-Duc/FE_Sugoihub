@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getConservationId, getMessageChat, uploadImageChat } from '../../redux/Chat/Chat.thunk';
 import InputEmoji from "react-input-emoji";
 import { useSocket } from '../../socket/SocketContext';
-import { Button, message, Select, Upload, Image, Popover, Avatar } from 'antd';
+import { Button, message, Select, Upload, Image, Popover, Avatar, Input } from 'antd';
 import { addMessage, deleteMessage, updateMessageStatus } from '../../redux/Chat/Chat.sllice';
 import { MdOutlineGroupAdd } from "react-icons/md";
 import CreateGroupChat from '../../components/modals/CreateGroupChat';
@@ -15,8 +15,77 @@ import { FaTrash } from "react-icons/fa";
 import { CiUser } from "react-icons/ci";
 import { MdOutlineGroups3 } from "react-icons/md";
 import { motion } from 'framer-motion';
+import { getMessageContent } from '../../helpers/chat'
+import { updatelistchat } from '../../redux/Chat/Chat.sllice';
 
 import { voice } from '../../redux/Chat/Chat.thunk';
+const { Search } = Input;
+const containerVariants = {
+    hidden: {
+        opacity: 0,
+        scale: 0.8,
+        y: 50
+    },
+    visible: {
+        opacity: 1,
+        scale: 1,
+        y: 0,
+        transition: {
+            duration: 0.8,
+            ease: "easeOut",
+            staggerChildren: 0.3,
+            delayChildren: 0.2
+        }
+    }
+};
+const itemVariants = {
+    hidden: {
+        opacity: 0,
+        y: 20
+    },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.5,
+            ease: "easeOut"
+        }
+    },
+    hover: {
+        scale: 1.1,
+        rotate: [0, -5, 5, -5, 0],
+        transition: {
+            duration: 0.4,
+            ease: "easeInOut",
+            rotate: {
+                repeat: Infinity,
+                duration: 2,
+                ease: "linear"
+            }
+        }
+    }
+};
+const textVariants = {
+    hidden: {
+        opacity: 0,
+        y: 20
+    },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.5,
+            ease: "easeOut"
+        }
+    }
+};
+
+const chatVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+
 const chatSound = new Audio(livechat);
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -43,8 +112,8 @@ const Message = () => {
     const [modalInfor, setModalInfor] = useState(false)
     const [loadinglistchat, setLoadingListChat] = useState(false)
     const chats = useSelector((state) => state.chat.chats)
-
-
+    const [searchText, setSearchText] = useState('');
+    const [loadingmessage, setLoadingMessage] = useState(false)
     const handleClickUpload = () => {
         setShowUpload(!showUpload);
     };
@@ -81,6 +150,12 @@ const Message = () => {
             messageEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
     };
+    useEffect(() => {
+
+        if (!conversation.some((conv) => conv.conversationId === selectedConservation?.conversationId)) {
+            setSelectedConservation(null);
+        }
+    }, [conversation, selectedConservation]);
 
 
     useEffect(() => {
@@ -102,13 +177,43 @@ const Message = () => {
         fetchData();
     }, [dispatch]);
     useEffect(() => {
+
         if (selectedConservation) {
+
             socket.emit("joinRoom", selectedConservation.conversationId);
-            dispatch(getMessageChat({ conversationId: selectedConservation.conversationId }))
+
+
+            setLoadingMessage(true);
+
+
+            const getMessages = async () => {
+                try {
+
+                    const res = await dispatch(
+                        getMessageChat({ conversationId: selectedConservation.conversationId })
+                    ).unwrap();
+
+                } catch (error) {
+
+                    message.error("Lỗi không tải được tin nhắn: " + error.message);
+                } finally {
+
+                    setLoadingMessage(false);
+                }
+            };
+
+
+            getMessages();
+
+
+
         }
 
 
+
     }, [selectedConservation, socket]);
+
+
     useEffect(() => {
         if (selectedConservation && socket) {
 
@@ -129,23 +234,39 @@ const Message = () => {
             };
             socket.on("receiveMessage", handleMessage);
             const handleMessageRead = (data) => {
-                console.log("nhận thông tin mới : ", data)
+
                 dispatch(updateMessageStatus({
                     messageId: data._id,
                     status: data.status,
                     seenBy: data.seenBy
                 }));
             };
+            const handleMessageDelete = (data) => {
+
+                dispatch(deleteMessage({ messageId: data._id }))
+                if (data.sender === userinfor._id) {
+                    message.success("xóa tin nhắn thành công")
+                }
+            };
+            const handleUpdateConversation = (data) => {
+                dispatch(updatelistchat({ data }))
+
+            }
+            socket.on("newinforgroupchat", handleUpdateConversation);
+            socket.on("messageDeleted", handleMessageDelete);
+
 
             socket.on("messageRead", handleMessageRead);
 
             return () => {
                 socket.off("receiveMessage", handleMessage);
                 socket.off("messageRead", handleMessageRead);
+                socket.off("messageDeleted", handleMessageDelete);
 
             };
         }
     }, [selectedConservation, socket, dispatch]);
+
     const sendMessage = async () => {
         if (newMessage.trim() !== "" || fileList.length > 0 || audioBlob) {
             setIsSending(true);
@@ -211,10 +332,16 @@ const Message = () => {
         if (messageEndRef.current) {
             messageEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
-    }, [chats, newMessage, isSending]);
+    }, [chats, newMessage, isSending, loadingmessage]);
     const handleDeleteMessage = (messageId) => {
-        dispatch(deleteMessage(messageId));
-        message.success(`xóa tin nhắn thành công ${messageId}`)
+
+        const messageData = {
+            messageId,
+            roomId: selectedConservation.conversationId,
+
+        };
+        socket.emit("messageDelete", messageData);
+
     }
     const Content = ({ messageId }) => (
         <div>
@@ -227,7 +354,7 @@ const Message = () => {
         </div>
     );
 
-    //// voice
+
     const [isRecording, setIsRecording] = useState(false);
     const [audioBlob, setAudioBlob] = useState(null);
 
@@ -286,7 +413,7 @@ const Message = () => {
             }
         } catch (error) {
             console.error('Error uploading audio:', error);
-            alert('Failed to upload voice message.');
+            message.error('Failed to upload voice message.');
         }
     };
 
@@ -297,7 +424,7 @@ const Message = () => {
                 <div className="flex flex-col md:flex-row h-[calc(100vh-180px)] ">
                     {/* Friends List */}
                     {(showFriendsList || !isMobile) && (
-                        <div className="w-full md:w-80 bg-[#F2DDDC] border-b md:border-r border-base-300">
+                        <div className="w-full md:w-80 bg-[#eeeaea] border-b md:border-r border-base-300">
                             {/* Header */}
                             <div className="p-4 border-b border-base-300 shadow-sm">
                                 <div className="flex items-center justify-between">
@@ -320,11 +447,39 @@ const Message = () => {
                                 <div className="relative">
                                     <input
                                         type="text"
+                                        value={searchText}
+                                        onChange={(e) => setSearchText(e.target.value)}
                                         placeholder="Tìm kiếm tin nhắn..."
                                         className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-full bg-gray-50 transition-all duration-300 ease-in-out focus:bg-white focus:ring-2 focus:ring-primary focus:outline-none"
                                     />
+
                                     <i className="bi bi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 transition-colors duration-300"></i>
+
                                 </div>
+                                {searchText.trim() !== "" && (
+                                    <div className="mt-2 card card-compact bg-base-100 w-56 shadow-xl z-10 fixed ">
+
+                                        <div className="card-body">
+                                            <Avatar
+                                                size={48}
+                                                className="object-cover"
+                                            // src={
+                                            //     (isGroup && avatar?.url)
+                                            //         ? avatar.url
+                                            //         : (!isGroup && friend?.avatar?.url)
+                                            //             ? friend.avatar.url
+                                            //             : null // Không có URL sẽ hiển thị icon
+                                            // }
+                                            // alt={isGroup ? name : friend?.username}
+                                            // icon={
+                                            //     (!(isGroup && avatar?.url) && <MdOutlineGroups3 />) && (!(friend?.avatar?.url) && <CiUser />)
+                                            // }
+                                            />
+                                            <h2 className="card-title">Shoes!</h2>
+                                        </div>
+                                    </div>
+                                )}
+
                             </div>
                             {loadinglistchat ? (
                                 <div className="flex w-52 flex-col gap-4">
@@ -358,61 +513,75 @@ const Message = () => {
                                     const isOnline = (isGroup && participants.some(participant => onlineUsers.includes(participant._id))) || (!isGroup && onlineUsers.includes(friend?._id));
 
                                     return (
-                                        <div
-                                            key={conversation.conversationId}
-                                            className="flex items-center gap-3 p-3 md:p-4 cursor-pointer hover:bg-[#E3AADD] border-b border-base-200"
-                                            onClick={() => handleConversationSelect(conversation)}
+                                        <motion.div
+                                            className="bg-gradient-to-r from-[#FFFFFF] to-[#F0F0F0]rounded-lg shadow-2xl hover:shadow-1xl transition-shadow duration-300"
+                                            variants={containerVariants}
+                                            initial="hidden"
+                                            animate="visible"
+                                            whileHover={{ scale: 1.05 }}
                                         >
-                                            {/* Avatar */}
-                                            <div className="relative">
-                                                <div className="avatar">
-                                                    <div className="w-12 h-12 rounded-full overflow-hidden">
-                                                        <Avatar
-                                                            size={48}
-                                                            className="object-cover"
-                                                            src={
-                                                                (isGroup && avatar?.url)
-                                                                    ? avatar.url
-                                                                    : (!isGroup && friend?.avatar?.url)
-                                                                        ? friend.avatar.url
-                                                                        : null // Không có URL sẽ hiển thị icon
-                                                            }
-                                                            alt={isGroup ? name : friend?.username}
-                                                            icon={
-                                                                (!(isGroup && avatar?.url) && <MdOutlineGroups3 />) && (!(friend?.avatar?.url) && <CiUser />)
-                                                            }
-                                                        />
+                                            <div
+                                                key={conversation.conversationId}
+                                                className="flex items-center gap-3 p-3 md:p-4 cursor-pointer  border-b border-base-200"
+                                                onClick={() => handleConversationSelect(conversation)}
+                                            >
+                                                {/* Avatar */}
+                                                <div className="relative">
+                                                    <div className="avatar">
+                                                        <div className="w-12 h-12 rounded-full overflow-hidden">
+                                                            <Avatar
+                                                                size={48}
+                                                                className="object-cover"
+                                                                src={
+                                                                    (isGroup && avatar?.url)
+                                                                        ? avatar.url
+                                                                        : (!isGroup && friend?.avatar?.url)
+                                                                            ? friend.avatar.url
+                                                                            : null
+                                                                }
+                                                                alt={isGroup ? name : friend?.username}
+                                                                icon={
+                                                                    (!(isGroup && avatar?.url) && <MdOutlineGroups3 />) && (!(friend?.avatar?.url) && <CiUser />)
+                                                                }
+                                                            />
 
 
+                                                        </div>
                                                     </div>
+
+                                                    <span
+                                                        className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${isOnline ? "bg-green-500" : "bg-gray-400"
+                                                            }`}
+                                                    />
                                                 </div>
 
-                                                <span
-                                                    className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${isOnline ? "bg-green-500" : "bg-gray-400"
-                                                        }`}
-                                                />
-                                            </div>
+                                                {/* Thông tin chat */}
+                                                <div className="flex-1">
+                                                    <div className="flex justify-between items-center">
+                                                        {/* Tên người dùng hoặc nhóm */}
+                                                        <h3 className="font-semibold text-gray-800 truncate">
+                                                            {isGroup ? name : friend?.username}
+                                                        </h3>
+                                                    </div>
 
-                                            {/* Thông tin chat */}
-                                            <div className="flex-1">
-                                                <div className="flex justify-between items-center">
-                                                    {/* Tên người dùng hoặc nhóm */}
-                                                    <h3 className="font-semibold text-gray-800 truncate">
-                                                        {isGroup ? name : friend?.username}
-                                                    </h3>
+                                                    {/* Tin nhắn cuối cùng */}
+                                                    <p
+                                                        className="text-sm text-gray-600 truncate max-w-[200px] w-full"
+                                                        title={conversation.lastMessage?.content || ""}
+                                                    >
+                                                        {conversation.lastMessage && (
+
+                                                            conversation.lastMessage?.sender._id === userinfor?._id
+                                                                ? `Bạn: ${getMessageContent(conversation.lastMessage)}`
+
+                                                                : `${conversation.lastMessage.sender.username}: ${getMessageContent(conversation.lastMessage)}`
+
+                                                        )}
+
+                                                    </p>
                                                 </div>
-
-                                                {/* Tin nhắn cuối cùng */}
-                                                <p
-                                                    className="text-sm text-gray-600 truncate max-w-[200px] w-full"
-                                                    title={conversation.lastMessage?.content || ""}
-                                                >
-                                                    {conversation.lastMessage?.sender._id === userinfor?._id
-                                                        ? `Bạn: ${conversation.lastMessage?.content || "Hình ảnh"}`
-                                                        : `${conversation.lastMessage?.sender.username}: ${conversation.lastMessage?.content || "Hình ảnh"}`}
-                                                </p>
                                             </div>
-                                        </div>
+                                        </motion.div>
                                     );
                                 })}
                             </div>)}
@@ -424,11 +593,11 @@ const Message = () => {
 
                     {/* Chat Area */}
                     {(!showFriendsList || !isMobile) && (
-                        <div className="flex-1 flex flex-col min-h-0 bg-[#F4E7FB] overflow-hidden">
+                        <div className="flex-1 flex flex-col min-h-0 bg-[#F5F5F5 ] overflow-hidden">
 
                             {selectedConservation ? (
                                 <>
-                                    <div className="p-3 md:p-4 border-b border-base-300 bg-[#F4E7FB] flex-shrink-0">
+                                    <div className="p-3 md:p-4 border-b border-base-300 bg-[#F5F5F5 ] flex-shrink-0">
                                         <div className="flex items-center justify-between gap-3">
                                             {isMobile && (
                                                 <button
@@ -441,19 +610,18 @@ const Message = () => {
 
                                             {/* Avatar */}
                                             <div className="avatar flex-shrink-0">
-                                                <div className="w-8 md:w-10 h-8 md:h-10 rounded-full">
-                                                    <Avatar size={{
-                                                        xs: 24,
-                                                        sm: 32,
-                                                        md: 40,
-
-                                                    }} alt="Current chat"
-                                                        className="object-cover" src={
+                                                <div className="w-12 md:w-12 h-12 md:h-12   border-gray-200">
+                                                    <Avatar
+                                                        size={48}
+                                                        alt="Current chat"
+                                                        className="object-cover "
+                                                        src={
                                                             selectedConservation.isGroup === true
                                                                 ? selectedConservation.avatar?.url
                                                                 : selectedConservation.friend.avatar?.url
-                                                        } icon={<CiUser />} />
-
+                                                        }
+                                                        icon={<CiUser className="text-gray-600" />}
+                                                    />
                                                 </div>
                                             </div>
 
@@ -464,17 +632,16 @@ const Message = () => {
                                                         ? selectedConservation.name
                                                         : selectedConservation.friend.username}
                                                 </h3>
-                                                <p className="text-xs md:text-sm text-[#595959]">
+                                                <p className="text-xs md:text-sm">
                                                     {selectedConservation.isGroup === true
                                                         ? selectedConservation.participants.some(participant => onlineUsers.includes(participant._id))
-                                                            ? "Đang hoạt động"
-                                                            : "Không hoạt động"
+                                                            ? <span className="text-green-500">Đang hoạt động</span>
+                                                            : <span className="text-gray-500">Không hoạt động</span>
                                                         : onlineUsers.includes(selectedConservation.friend._id)
-                                                            ? "Đang hoạt động"
-                                                            : "Không hoạt động"}
+                                                            ? <span className="text-green-500">Đang hoạt động</span>
+                                                            : <span className="text-gray-500">Không hoạt động</span>}
                                                 </p>
                                             </div>
-
                                             {/* Information Icon */}
                                             {selectedConservation.isGroup === true && (
                                                 <div className="flex items-center justify-center">
@@ -491,74 +658,111 @@ const Message = () => {
 
 
                                     <div className="flex-1 flex flex-col min-h-0 relative">
-                                        <div className="flex-1 overflow-y-auto p-3 md:p-4 bg-[#F2DDDC]  max-h-full" >
-                                            {chats.map((chat) => (
-                                                <div
-                                                    key={chat._id}
-                                                    className={`chat ${chat.sender._id === userinfor._id ? "chat-end" : "chat-start"}`}
-                                                >
-                                                    {/* Avatar người gửi */}
-                                                    <div className="chat-image avatar">
-                                                        <Avatar size="large" src={chat.sender.avatar?.url} icon={<CiUser />} />
 
-                                                    </div>
-
-
-
-                                                    {/* Nội dung tin nhắn và Popover */}
-                                                    {chat.sender._id === userinfor._id ? (
-                                                        <Popover
-                                                            content={<Content messageId={chat._id} />}
-                                                            title="Tùy chọn"
-                                                            trigger="click"
+                                        <div className="flex-1 overflow-y-auto p-3 md:p-4 bg-[#595959 ] max-h-full">
+                                            {loadingmessage ? (
+                                                <div className="flex flex-col space-y-6 p-4 max-w-2xl mx-auto">
+                                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((item) => (
+                                                        <div
+                                                            key={item}
+                                                            className={` flex space-x-3 ${item % 2 === 0 ? "justify-end" : "justify-start"}`}
                                                         >
-                                                            <div className="chat-bubble break-words max-w-[75%] bg-[#4b49c5]">
-                                                                {chat.images && chat.images.map((image) => (
-                                                                    <img
-                                                                        key={image._id}
-                                                                        src={image.url}
-                                                                        alt="Message attachment"
-                                                                        className="max-w-full h-auto rounded-lg mt-2"
-                                                                    />
-                                                                ))}
-                                                                {chat.voices && (
-                                                                    <audio src={chat.voices.url} controls autoplay className='h-8 w-44'>
-                                                                        Your browser does not support the audio element.
-                                                                    </audio>
-                                                                )}
-                                                                {chat.content}
+                                                            {item % 2 !== 0 && (
+                                                                <div className=" skeleton w-10 h-10  rounded-full"></div>
+                                                            )}
+                                                            <div
+                                                                className={` flex flex-col space-y-2 ${item % 2 === 0 ? "items-end" : "items-start"}`}
+                                                            >
+                                                                <div className=" skeleton h-4  rounded w-48"></div>
+                                                                <div className=" skeleton h-4 rounded w-32 "></div>
                                                             </div>
-                                                        </Popover>
-                                                    ) : (
-                                                        <div className="chat-bubble break-words max-w-[75%] bg-[#4b49c5]">
-                                                            {chat.images && chat.images.map((image) => (
-                                                                <img
-                                                                    key={image._id}
-                                                                    src={image.url}
-                                                                    alt="Message attachment"
-                                                                    className="max-w-full h-auto rounded-lg mt-2"
-                                                                />
-                                                            ))}
-                                                            {chat.voices && (
-                                                                <div> helofrom the outsite </div>
+                                                            {item % 2 === 0 && (
+                                                                <div className=" skeleton w-10 h-10  rounded-full "></div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                chats.map((chat, index) => (
+                                                    <motion.div
+                                                        key={chat._id}
+                                                        variants={chatVariants}
+                                                        initial="hidden"
+                                                        animate="visible"
+                                                        whileHover={{ scale: 1.02 }}
+                                                        transition={{ delay: index * 0.1 }}
+                                                    >
+                                                        <div
+                                                            className={`chat ${chat.sender._id === userinfor._id ? "chat-end" : "chat-start"}`}
+                                                        >
+                                                            {/* Avatar người gửi */}
+                                                            <div className="chat-image avatar">
+                                                                <Avatar size="large" src={chat.sender.avatar?.url} icon={<CiUser />} />
+                                                            </div>
+
+                                                            {/* Nội dung tin nhắn và Popover */}
+                                                            {chat.sender._id === userinfor._id ? (
+                                                                <Popover
+                                                                    content={<Content messageId={chat._id} />}
+                                                                    title="Tùy chọn"
+                                                                    trigger="click"
+                                                                >
+                                                                    <motion.div
+                                                                        className="chat-bubble break-words max-w-[75%] bg-[#63dbe4]"
+                                                                        whileHover={{ scale: 1.05 }}
+                                                                    >
+                                                                        {chat.images && chat.images.map((image) => (
+                                                                            <motion.img
+                                                                                key={image._id}
+                                                                                src={image.url}
+                                                                                alt="Message attachment"
+                                                                                className="max-w-full h-auto rounded-lg mt-2"
+                                                                                whileHover={{ scale: 1.1 }}
+                                                                            />
+                                                                        ))}
+                                                                        {chat.voices && (
+                                                                            <audio src={chat.voices.url} controls autoPlay className="h-8 w-44">
+                                                                                Trình duyệt của bạn không hỗ trợ
+                                                                            </audio>
+                                                                        )}
+                                                                        <div class="text-black">{chat.content}</div>
+                                                                    </motion.div>
+                                                                </Popover>
+                                                            ) : (
+                                                                <motion.div
+                                                                    className="chat-bubble break-words max-w-[75%] bg-[#63dbe4]"
+                                                                    whileHover={{ scale: 1.05 }}
+                                                                >
+                                                                    {chat.images && chat.images.map((image) => (
+                                                                        <motion.img
+                                                                            key={image._id}
+                                                                            src={image.url}
+                                                                            alt="Message attachment"
+                                                                            className="max-w-full h-auto rounded-lg mt-2"
+                                                                            whileHover={{ scale: 1.1 }}
+                                                                        />
+                                                                    ))}
+                                                                    {chat.voices && (
+                                                                        <div>Tin nhắn ghi âm </div>
+                                                                    )}
+                                                                    <div class="text-black">{chat.content}</div>
+                                                                </motion.div>
                                                             )}
 
-                                                            {chat.content}
+                                                            {/* Footer tin nhắn */}
+                                                            {chat.sender._id === userinfor._id && (
+                                                                <motion.div
+                                                                    className="chat-footer opacity-50"
+                                                                    whileHover={{ opacity: 1 }} // Hiệu ứng khi hover
+                                                                >
+                                                                    {chat.status === "sent" ? "Đã gửi" : "Đã xem"}
+                                                                </motion.div>
+                                                            )}
                                                         </div>
-                                                    )}
-
-                                                    {/* Footer tin nhắn */}
-                                                    {chat.sender._id === userinfor._id && (
-                                                        <div className="chat-footer opacity-50">
-                                                            {chat.status === "sent" ? "Đã gửi" : "Đã xem"}
-                                                        </div>
-
-                                                    )}
-
-
-                                                </div>
-                                            ))}
-
+                                                    </motion.div>
+                                                ))
+                                            )}
+                                            {/* Tham chiếu để cuộn xuống cuối */}
                                             <div ref={messageEndRef} />
                                         </div>
                                         {showUpload && (
@@ -602,7 +806,7 @@ const Message = () => {
 
                                         )}
                                         <div className=" bottom-0 bg-[#F2DDDC] border-t border-base-300">
-                                            <div className="flex items-center gap-2 bg-blue-100 rounded-lg p-2">
+                                            <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-2">
 
                                                 {(!audioBlob && !isRecording) && (
 
@@ -656,6 +860,18 @@ const Message = () => {
                                                             width: "100%",
                                                         }}
                                                     >
+                                                        <div >
+                                                            <InputEmoji
+                                                                value={newMessage}
+                                                                onChange={setNewMessage}
+                                                                cleanOnEnter
+
+                                                                placeholder="Viết bình luận..."
+
+                                                                height={40}
+
+                                                            />
+                                                        </div>
                                                         <div className="flex-1 relative max-w-[320px]">
                                                             <div className="max-h-[100px]">
                                                                 <InputEmoji
@@ -664,7 +880,7 @@ const Message = () => {
                                                                     onChange={setNewMessage}
                                                                     cleanOnEnter
                                                                     placeholder="Nhập tin nhắn của bạn"
-                                                                    className="w-full border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+
                                                                 />
                                                             </div>
                                                         </div>
@@ -672,13 +888,15 @@ const Message = () => {
                                                 )}
                                                 {!isRecording && (
                                                     <button
-                                                        className="btn btn-circle bg-blue-500 hover:bg-blue-600 text-white btn-sm md:btn-md "
+                                                        className="btn btn-circle bg-gradient-to-r from-[#46A29E] to-[#64B5F6] hover:from-[#3C8C88] hover:to-[#42A5F5] text-white btn-sm md:btn-md"
                                                         onClick={sendMessage}
-
                                                         disabled={isSending}
                                                     >
-
-                                                        {isSending ? <span className="loading loading-infinity loading-lg"></span> : <i className="bi bi-send-fill"></i>}
+                                                        {isSending ? (
+                                                            <span className="loading loading-infinity loading-lg"></span>
+                                                        ) : (
+                                                            <i className="bi bi-send-fill text-white"></i>
+                                                        )}
                                                     </button>
                                                 )}
                                             </div>
@@ -687,18 +905,71 @@ const Message = () => {
 
                                 </>
                             ) : (
-                                <div className="flex-1 flex items-center justify-center">
-                                    <p className="text-[#595959]">
-                                        Hãy chọn một cuộc trò chuyện để bắt đầu
-                                    </p>
-                                </div>
+                                <motion.div
+                                    className="flex-1 flex flex-col items-center justify-center space-y-6 p-8 bg-gradient-to-r from-[#dfe1e4] to-[#d1d8d8] rounded-lg shadow-2xl"
+                                    variants={containerVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                >
+                                    {/* Icon với animation nâng cao */}
+                                    <motion.div
+                                        className="p-6 bg-gradient-to-r from-[#66FCF0] to-[#46A29E] rounded-full shadow-lg relative"
+                                        variants={itemVariants}
+                                        whileHover="hover"
+                                        whileTap={{ scale: 0.95 }}
+                                    >
+                                        <motion.div
+                                            className="absolute inset-0 bg-white rounded-full"
+                                            initial={{ scale: 0 }}
+                                            whileHover={{
+                                                scale: 1.2,
+                                                opacity: 0.2,
+                                                transition: { duration: 0.3 }
+                                            }}
+                                        />
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-20 w-20 text-white relative z-10"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <motion.path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                                                initial={{ pathLength: 0 }}
+                                                animate={{ pathLength: 1 }}
+                                                transition={{ duration: 2, ease: "easeInOut" }}
+                                            />
+                                        </svg>
+                                    </motion.div>
+
+
+                                    <motion.p
+                                        className="text-transparent bg-clip-text text-white text-2xl font-bold text-center"
+                                        variants={textVariants}
+                                        style={{
+                                            textShadow: "0 0 20px rgba(255,65,108,0.3)"
+                                        }}
+                                    >
+                                        <motion.span
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: 0.5, duration: 0.5 }}
+                                        >
+                                            Hãy chọn một cuộc trò chuyện để bắt đầu
+                                        </motion.span>
+                                    </motion.p>
+                                </motion.div>
                             )}
                         </div>
                     )}
 
                 </div>
             </div>
-        </div>
+        </div >
 
 
     );

@@ -114,8 +114,13 @@ const EditPost = ({ open, onClose, post }) => {
 
     const [fileListvideo, setFileListVideo] = useState([]);
     useEffect(() => {
-        if (post.videos) {
-            setFileListVideo([{ url: post.videos.url, publicId: post.videos.publicId }])
+        if (post.videos && Array.isArray(post.videos)) {
+            console.log("có truyền được không: ", post)
+            const updatedFileListvideo = post.videos.map(video => ({
+                url: video.url,
+                publicId: video.publicId,
+            }));
+            setFileListVideo(updatedFileListvideo)
         }
         if (post.images && Array.isArray(post.images)) {
             const updatedFileList = post.images.map(image => ({
@@ -167,13 +172,18 @@ const EditPost = ({ open, onClose, post }) => {
     };
     useEffect(() => {
         return () => {
-
+            console.log("xem có video list không  ", fileListvideo)
             fileListvideo.forEach(file => {
                 if (file.preview) {
                     URL.revokeObjectURL(file.preview);
                 }
             });
         };
+
+    }, [fileListvideo]);
+    useEffect(() => {
+        console.log("xem có video list không  ", fileListvideo)
+
     }, [fileListvideo]);
     const [isCancelConfirmVisible, setCancelConfirmVisible] = useState(false);
 
@@ -213,29 +223,30 @@ const EditPost = ({ open, onClose, post }) => {
         <>
             <Modal
                 title="Bài đăng mới"
-                centered
+
 
                 open={open}
                 getContainer={false}
                 maskClosable={false}
                 footer={[
-                    <Button key="cancel" onClick={() => onClose()}>
+                    <Button
+                        key="cancel"
+                        onClick={onClose}
+                        icon={<i className="bi bi-trash text-lg mr-2"></i>}
+                        className="w-full md:w-auto bg-slate-500 text-white px-6 py-2 rounded-lg hover:bg-slate-400 active:bg-slate-800 transition duration-200 shadow"
+                    >
                         Hủy
                     </Button>,
-                    <div
-                        key="submit-btn-container"
-                        className="flex justify-between mt-4 pt-3 border-t border-gray-100"
-                    >
-                        <Button
-                            onClick={handleEditPost}
-                            loading={isUploading}
-                            icon={<i className="bi bi-send text-lg mr-2"></i>}
-                            className="w-full md:w-auto bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 active:bg-blue-700 transition duration-200 shadow"
-                        >
 
-                            Đăng
-                        </Button>
-                    </div>,
+                    <Button
+                        onClick={handleEditPost}
+                        loading={isUploading}
+                        icon={<i className="bi bi-send text-lg mr-2"></i>}
+                        className="w-full md:w-auto bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 active:bg-blue-700 transition duration-200 shadow"
+                    >
+                        Đăng
+                    </Button>
+
                 ]}
             >
                 {/* Header: Avatar và tên người dùng */}

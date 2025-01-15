@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { handleGetAllPost, handleAdminDeletePost, handleHidePost } from "../../../services/admin";
+import { handleGetAllPost, handleAdminDeletePost, handleHidePost, handleGetAllCommentByPost } from "../../../services/admin";
 
 export const getAllPost = createAsyncThunk(
     'admin/post/all',
@@ -30,6 +30,20 @@ export const hidePost = createAsyncThunk(
     async ({ id, hide }, { rejectWithValue }) => {
         try {
             return await handleHidePost(id, hide)
+
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+)
+
+
+
+export const allcommentbypost = createAsyncThunk(
+    'admin/post/ all comment',
+    async ({ id }, { rejectWithValue }) => {
+        try {
+            return await handleGetAllCommentByPost(id)
 
         } catch (error) {
             return rejectWithValue(error.response.data);

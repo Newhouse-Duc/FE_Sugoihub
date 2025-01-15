@@ -9,7 +9,7 @@ const Rightbar = () => {
     const receivedRequests = useSelector((state) => state.friendship.receivedRequests);
     const userinfor = useSelector((state) => state.auth.userinfor);
 
-    const MAX_DISPLAY = 5; // Số lượng lời mời hiển thị tối đa
+    const MAX_DISPLAY = 5;
 
     useEffect(() => {
         if (userinfor?._id) {
@@ -36,7 +36,7 @@ const Rightbar = () => {
                 <div className="card bg-gray-500 w-48 shadow-xl my-1">
                     <div className="card-body">
                         <div className="text-white text-center font-bold mb-2">Lời mời kết bạn</div>
-                        {receivedRequests.length > 0 ? (
+                        {(receivedRequests.length > 0 && receivedRequests !== userinfor._id) ? (
                             <>
                                 <ul className="space-y-2">
                                     {receivedRequests.slice(0, MAX_DISPLAY).map((request) => (

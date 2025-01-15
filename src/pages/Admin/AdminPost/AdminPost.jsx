@@ -82,7 +82,7 @@ const AdminPost = () => {
                             key={image._id}
                             className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border border-gray-300"
                         >
-                            <img
+                            <Image
                                 src={image.url}
                                 alt="Post content"
                                 className="w-full h-full object-cover"
@@ -103,11 +103,11 @@ const AdminPost = () => {
                     {Array.isArray(videos) &&
                         videos.map((video) => (
                             <Image
-                                width={200}
+                                width={100}
                                 key={video._id}
-                                src="https://via.placeholder.com/150"
+                                src="https://placehold.co/159x150?text=Video"
                                 alt="Video preview"
-                                className="aspect-square w-24 h-24 object-cover rounded-lg"
+                                className="aspect-square w-20 h-20 object-cover rounded-lg"
                                 preview={{
                                     destroyOnClose: true,
                                     imageRender: () => (
@@ -199,7 +199,7 @@ const AdminPost = () => {
                     showSizeChanger: true,
                     pageSizeOptions: ['5', '10', '15'],
                 }}
-                scroll={{ x: 'max-content' }}  // Thêm cuộn ngang và cuộn dọc nếu cần
+                scroll={{ x: 'max-content' }}
 
                 rowKey={(record) => record._id}
                 onChange={handleTableChange}

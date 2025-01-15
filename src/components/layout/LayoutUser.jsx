@@ -15,7 +15,7 @@ const LayoutUser = ({ children }) => {
             {/* Header cố định ở trên cùng */}
             <HeaderUser className="fixed top-0 w-full z-50 bg-white shadow-sm" />
 
-            <div className="pt-16"> {/* pt-16 để tránh content bị header che */}
+            <div className="pt-16">
                 <div className="container mx-auto w-full flex gap-4">
                     {/* Sidebar bên trái */}
                     {!isMobile && (
