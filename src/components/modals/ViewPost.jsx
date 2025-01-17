@@ -8,7 +8,7 @@ import { Navigation, Pagination, Parallax, FreeMode, EffectFade } from 'swiper/m
 import ReplyComment from './ReplyComment';
 import { formatDistance } from 'date-fns';
 import { getReplyComment } from '../../redux/Comment/Comment.thunk';
-import { Collapse } from "antd";
+
 import { vi } from 'date-fns/locale';
 import { ThumbsUp, MessageSquare, Share2, MoreHorizontal } from 'lucide-react';
 import LazyNestedComments from '../NestedComments/LazyNestedComments';
@@ -21,18 +21,28 @@ const ViewPost = ({ isOpen, onClose, post, onCommentClick }) => {
     const [modalreply, setModalReply] = useState(false)
     const [reply, setReply] = useState(null)
     const comment = useSelector((state) => state.comment.comment)
+    const [loading, setloading] = useState(false)
     const formatDate = (date) => {
         return formatDistance(new Date(date), new Date(), {
             addSuffix: true,
             locale: vi
         });
     };
-    useEffect(() => {
-        if (post) {
-            dispatch(allCommentByPost({ id: post._id }))
+    const fetchcomment = async (postId) => {
+        setloading(true);
+        try {
+            await dispatch(allCommentByPost({ id: postId })).unwrap();
+        } catch (error) {
+            message.error(error.message || 'Có lỗi xảy ra');
+        } finally {
+            setloading(false);
         }
-
-    }, [post])
+    };
+    useEffect(() => {
+        if (post && post._id) {
+            fetchcomment(post._id);
+        }
+    }, [post]);
     const stopVideo = () => {
         if (videoRef.current) {
             videoRef.current.pause();
@@ -76,7 +86,7 @@ const ViewPost = ({ isOpen, onClose, post, onCommentClick }) => {
         }
     }, [isOpen]);
 
-    if (!isOpen) return null;
+
     return (
         <>
 
@@ -87,7 +97,7 @@ const ViewPost = ({ isOpen, onClose, post, onCommentClick }) => {
                         <span className="text-lg font-semibold">Bài viết</span>
                     </div>
                 }
-                centered
+
                 getContainer={false}
                 open={isOpen}
                 onCancel={() => onClose()}
@@ -199,31 +209,44 @@ const ViewPost = ({ isOpen, onClose, post, onCommentClick }) => {
 
                     <div className="h-px bg-gray-200 w-full my-4" />
 
-                    <div className="space-y-4">
-                        {comment?.length > 0 ? (
-                            <LazyNestedComments
-                                comments={comment}
-                                replyComments={replyComment}
-                                onLoadReplies={handleViewReplyComment}
-                                onReply={handleReplyComment}
-                                onLike={handleLikeComment}
-                            />
-                        ) : (
-                            <div className="text-center py-6 text-gray-500">
-                                Chưa có bình luận nào. Hãy là người đầu tiên bình luận!
+                    {loading ? (
+                        <div className="flex w-52 flex-col gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="skeleton h-12 w-12 shrink-0 rounded-full"></div>
+                                <div className="flex flex-col gap-4">
+                                    <div className="skeleton h-4 w-20"></div>
+                                    <div className="skeleton h-4 w-28"></div>
+                                </div>
                             </div>
-                        )}
-                    </div>
 
+                        </div>
+                    ) : (
+                        <div>
+                            <div className="space-y-4">
+                                {comment?.length > 0 ? (
+                                    <LazyNestedComments
+                                        comments={comment}
+                                        replyComments={replyComment}
+                                        onLoadReplies={handleViewReplyComment}
+                                        onReply={handleReplyComment}
+                                        onLike={handleLikeComment}
+                                    />
+                                ) : (
+                                    <div className="text-center py-6 text-gray-500">
+                                        Chưa có bình luận nào. Hãy là người đầu tiên bình luận!
+                                    </div>
+                                )}
+                            </div>
 
-                    <ReplyComment
-                        isOpen={modalreply}
-                        onClose={() => setModalReply(false)}
-                        comment={reply} />
-                    <div className="mt-4">
-                        <div className="divider "></div>
-
-                    </div>
+                            <ReplyComment
+                                isOpen={modalreply}
+                                onClose={() => setModalReply(false)}
+                                comment={reply} />
+                            <div className="mt-4">
+                                <div className="divider "></div>
+                            </div>
+                        </div>
+                    )}
 
                 </div>
 

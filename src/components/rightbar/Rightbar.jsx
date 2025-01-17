@@ -30,7 +30,7 @@ const Rightbar = () => {
     };
 
     return (
-        <div className="drawer xl:drawer-open drawer-end">
+        <div >
             <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
             <div className="drawer-side mx-1">
                 <div className="card bg-gray-500 w-48 shadow-xl my-1">

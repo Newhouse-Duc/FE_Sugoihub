@@ -5,7 +5,7 @@ import { SmileOutlined, CameraOutlined, SendOutlined } from '@ant-design/icons';
 import { replyComment } from '../../redux/Comment/Comment.thunk';
 import InputEmoji from "react-input-emoji";
 import { useSocket } from '../../socket/SocketContext';
-
+import Giphy from '../giphy/Giphy';
 
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -27,9 +27,19 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
     const [showUpload, setShowUpload] = useState(false);
     const [fileList, setFileList] = useState([]);
     const [text, setText] = useState("");
+    const [showgif, setShowGif] = useState(false)
+    const [selectedGif, setSelectedGif] = useState(null);
+    const handleGifSelect = (gif) => {
+        setSelectedGif(gif);
+    };
     const handleClickUpload = () => {
         setShowUpload(!showUpload);
+        setShowGif(false)
     };
+    const handleShowGif = () => {
+        setShowGif(!showgif)
+    }
+
     const handleChangeUpload = ({ fileList: newFileList }) => {
         setFileList(newFileList)
     }
@@ -65,6 +75,13 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
             data.append("author", userinfor._id);
             data.append("parentId", comment._id);
             data.append("postId", comment.postId);
+            if (selectedGif) {
+                const gifData = {
+                    url: selectedGif.url,
+                    id: selectedGif.id
+                };
+                data.append("gif", JSON.stringify(gifData));
+            }
             fileList.forEach((file) => {
                 if (file.originFileObj) {
                     data.append("images", file.originFileObj);
@@ -89,6 +106,8 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
                 message.success('Đăng bình luận thành công');
                 setText("")
                 setFileList([]);
+                setSelectedGif(null);
+                setShowGif(false);
                 onClose();
             }
         } catch (error) {
@@ -111,8 +130,8 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
                         <span className="text-xl font-bold text-gray-700">Phản hồi bình luận</span>
                     </div>
                 }
-                centered
-                getContainer={false}
+
+                getContainer={() => document.body}
                 open={isOpen}
                 onCancel={onClose}
                 maskClosable={false}
@@ -143,9 +162,9 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
                     </div>
                 }
             >
-                <div className="space-y-4 p-4 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                <div className="space-y-4 p-4 rounded-lg hover:bg-gray-50 transition-colors duration-200  ">
                     {/* Comment Section */}
-                    <div key={commentorg?._id} className="flex space-x-4 p-4 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                    <div key={commentorg?._id} className="flex space-x-4 p-4 rounded-lg hover:bg-gray-100 transition-colors duration-200 border-b-2">
                         {/* Avatar */}
                         <div className="flex-shrink-0">
                             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center ring-2 ring-offset-2 ring-blue-500">
@@ -180,14 +199,20 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
                                     ))}
                                 </div>
                             )}
+                            {commentorg?.gif && (<img
+                                key={commentorg.gif.id}
+                                src={commentorg.gif.url}
+
+                                className="max-w-full  h-28 "
+                            />)}
                         </div>
                     </div>
 
-                    {/* Divider */}
-                    <div className="divider my-4"></div>
+
+
 
                     {/* Reply Section */}
-                    <div className="mt-6">
+                    <div className="mt-2">
                         {/* User Info */}
                         <div className="flex items-center gap-4">
                             <Avatar
@@ -231,21 +256,41 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
                         )}
 
                         {/* Comment Input */}
-                        <div className="mt-4 flex items-center gap-4">
-                            <InputEmoji
-                                value={text}
-                                onChange={setText}
-                                cleanOnEnter
-                                placeholder={`Trả lời bình luận của ${commentorg?.author?.username}`}
-                                className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
-                            />
-                            <button
-                                className="text-gray-500 hover:text-blue-500 transition-colors duration-200"
-                                onClick={handleClickUpload}
-                            >
-                                <i className="bi bi-camera text-2xl" />
-                            </button>
+                        <div className="mt-4  items-center gap-4  flex-1 relative max-w-[600px]  ">
+                            <div className=" items-center gap-2  rounded-lg p-2 ">
+
+
+                                {showgif && (
+                                    <div className="relative bottom-full mb-2 w-full ">
+                                        <Giphy onGifSelect={handleGifSelect} />
+                                    </div>
+                                )}
+
+                                <div className="flex-1 relative max-w-[600px] ">
+                                    <div className="max-h-[100px]">
+                                        <InputEmoji
+                                            value={text}
+                                            onChange={setText}
+                                            cleanOnEnter
+                                            placeholder={`Trả lời bình luận của ${commentorg?.author?.username}`}
+                                        />
+                                        <div className="flex gap-2 ml-4">
+                                            <Button onClick={handleClickUpload} className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                                                📸
+                                            </Button>
+                                            <Button onClick={handleShowGif} className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+                                                🕹️
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
                         </div>
+
+
+
                     </div>
                 </div>
 

@@ -24,6 +24,7 @@ export const chat = createSlice({
             console.log("xem adada", action.payload.messageId)
             state.chats = state.chats.filter((message) => message._id !== messageId);
         },
+
         updateMessageStatus: (state, action) => {
             const { messageId, status, seenBy } = action.payload;
 
@@ -54,6 +55,32 @@ export const chat = createSlice({
                 };
             }
 
+        },
+        deleteMember: (state, action) => {
+            const { conversationId, deletemember } = action.payload;
+
+            console.log("xem adada", action.payload)
+            const conversation = state.conversation.find(
+                (conv) => conv.conversationId === conversationId
+            );
+            if (conversation) {
+
+                conversation.participants = conversation.participants.filter(
+                    (participant) => participant._id !== deletemember
+                );
+            }
+        },
+        addMember: (state, action) => {
+            const { conversationId, members } = action.payload;
+
+            console.log("xem adada", action.payload)
+            const conversation = state.conversation.find(
+                (conv) => conv.conversationId === conversationId
+            );
+            if (conversation) {
+
+                conversation.participants = [...conversation.participants, ...members];
+            }
         },
     },
 
@@ -137,5 +164,5 @@ export const chat = createSlice({
             })
     },
 })
-export const { addMessage, deleteMessage, updateMessageStatus, updatelistchat } = chat.actions;
+export const { addMessage, deleteMessage, updateMessageStatus, updatelistchat, deleteMember, addMember } = chat.actions;
 export default chat.reducer

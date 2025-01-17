@@ -11,21 +11,26 @@ import { BsPersonCheck } from "react-icons/bs";
 import { IoNotificationsCircleOutline } from "react-icons/io5";
 import { BsThreeDots } from "react-icons/bs";
 import { MdOutlineNotificationsActive } from "react-icons/md";
-import { Dropdown, Space, message, Avatar } from 'antd';
+import { Dropdown, Space, message, Avatar, Tabs, ConfigProvider } from 'antd';
 import { markNotificationsAsReadOptimistic, removeNotification } from "../../redux/Notification/Notification.slice"
 import { maskReadNotifications } from "../../redux/Notification/Notification.thunk"
 import { UserOutlined, MailOutlined, LinkOutlined } from '@ant-design/icons';
 import { allNotification, deleteNotification } from '../../redux/Notification/Notification.thunk';
+import { useSocket } from '../../socket/SocketContext';
+
 
 const Notifications = () => {
 
-
+    const { socket } = useSocket()
     const dispatch = useDispatch()
     const [skip, setSkip] = useState(0);
+    const [allnotify, setAllNotify] = useState(false)
+    const userinfor = useSelector((state) => state.auth.userinfor)
     const limit = 5;
     useEffect(() => {
-        dispatch(allNotification({ skip, limit }));
-    }, [skip, dispatch]);
+        console.log(" sao gọi đi ", allnotify)
+        dispatch(allNotification({ skip, limit, allnotify }));
+    }, [skip, allnotify]);
     const renderIcon = (type) => {
         const iconClasses = "w-4 h-4";
         switch (type) {
@@ -56,23 +61,28 @@ const Notifications = () => {
             .filter(noti => !noti.isRead)
             .map(noti => noti._id);
 
-        console.log("Đâu nào : ", unreadIds);
+
+
 
         try {
             if (unreadIds.length > 0) {
                 setTimeout(() => {
-                    dispatch(markNotificationsAsReadOptimistic(unreadIds));
-                    dispatch(maskReadNotifications({ data: unreadIds }));
-                }, 2000);
+
+
+                    dispatch(markNotificationsAsReadOptimistic(unreadIds))
+                    dispatch(maskReadNotifications({ data: unreadIds }))
+                    const data = { id: userinfor._id };
+
+                    socket.emit("countnotification", data);
+                }, 3000);
             }
 
         } catch (error) {
-
-            console.error("Error during dispatch: ", error);
             message.error(error || 'Có lỗi xảy ra');
         }
 
     }, [allnotification]);
+
 
     const handlLoadMoreNotification = () => {
         setSkip(skip + limit);
@@ -164,96 +174,242 @@ const Notifications = () => {
     ];
 
 
+    const handleClick = (key) => {
+        if (key === '2') {
+            setAllNotify(true)
+        }
+        if (key === '1') {
+            setAllNotify(false)
+        }
+    };
+    const items = [
+        {
+            key: '1',
+            label: 'Tất cả thông báo',
+            children: (
+                <>
+
+                    <div className="overflow-y-auto max-h-[24rem] scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+                        <ul className="divide-y divide-gray-200 dark:divide-gray-700 mb-10">
+                            {allnotification?.map((notification, index) => (
+                                <li
+                                    key={`${notification._id}-${index}`}
+                                    className={`group flex relative items-center space-x-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 ${!notification.isRead ? 'bg-blue-50/80 dark:bg-gray-700/30' : ''
+                                        }`}
+                                >
+                                    <div className="relative flex-shrink-0">
+                                        <Avatar
+                                            size={50}
+                                            src={notification.sender.avatar.url}
+                                            icon={<UserOutlined />}
+                                            className="w-12 h-12 rounded-full object-cover ring-2 ring-white dark:ring-gray-700 shadow-sm group-hover:ring-blue-200 dark:group-hover:ring-gray-600 transition-all"
+                                        />
+
+                                        <div className="absolute -right-1 -bottom-1">
+                                            <div className="p-1 bg-white dark:bg-gray-800 rounded-full">
+                                                {renderIcon(notification.type)}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex flex-col">
+                                            <p className="text-sm text-gray-900 dark:text-gray-100 leading-snug pr-6">
+                                                <span className="font-semibold hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                                    {notification.sender.username}
+                                                </span>
+                                                <span className="ml-1">{notification.text}</span>
+                                            </p>
+                                            <span className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                                {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                                            </span>
+                                        </div>
+                                    </div>
+
+
+                                    {!notification.isRead && (
+                                        <div className="absolute right-4 top-10">
+                                            <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></div>
+                                        </div>
+                                    )}
+
+                                    <Space direction="vertical" className="absolute right-4 top-4 hidden group-hover:block">
+                                        <Space wrap>
+                                            <Dropdown
+                                                menu={{
+
+                                                    items: itemsNotification(notification),
+                                                }}
+                                                placement="bottomRight"
+                                            >
+
+                                                <BsThreeDots className="w-5 h-5 text-gray-500 hover:text-gray-700" />
+
+
+                                            </Dropdown>
+                                        </Space>
+                                    </Space>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    <div>{allnotification.length === 0 && (
+                        <div className="flex items-center justify-center  text-white text-lg font-semibold rounded-lg shadow-md transition transform hover:scale-105">
+                            Chưa có thông báo nào
+                        </div>
+
+                    )}</div>
+                    <div className="sticky bottom-0 z-10 bg-white dark:bg-gray-600 p-4 border-t border-gray-200 dark:border-gray-600 ">
+                        <a
+                            onClick={handlLoadMoreNotification}
+                            className="block w-full py-2.5 px-4 text-center text-sm font-medium bg-blue-50 dark:bg-[#00CDB8] text-slate-400 dark:text-white hover:bg-cyan-500 dark:hover:bg-cyan-400 transition-all duration-200 rounded-lg"
+                        >
+                            Xem thêm thông báo
+                        </a>
+                    </div>
+                </>
+            )
+        },
+        {
+            key: '2',
+            label: 'Chưa đọc',
+
+            children: (
+                <>
+                    <div className="overflow-y-auto max-h-[24rem] scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+                        <ul className="divide-y divide-gray-200 dark:divide-gray-700  mb-10">
+                            {allnotification
+                                .filter(notification => !notification.isRead)
+                                .map((notification, index) => (
+                                    <li
+                                        key={`${notification._id}-${index}`}
+                                        className={`group flex relative items-center space-x-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 ${!notification.isRead ? 'bg-blue-50/80 dark:bg-gray-700/30' : ''
+                                            }`}
+                                    >
+                                        <div className="relative flex-shrink-0">
+                                            <Avatar
+                                                size={50}
+                                                src={notification.sender.avatar.url}
+                                                icon={<UserOutlined />}
+                                                className="w-12 h-12 rounded-full object-cover ring-2 ring-white dark:ring-gray-700 shadow-sm group-hover:ring-blue-200 dark:group-hover:ring-gray-600 transition-all"
+                                            />
+
+                                            <div className="absolute -right-1 -bottom-1">
+                                                <div className="p-1 bg-white dark:bg-gray-800 rounded-full">
+                                                    {renderIcon(notification.type)}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex flex-col">
+                                                <p className="text-sm text-gray-900 dark:text-gray-100 leading-snug pr-6">
+                                                    <span className="font-semibold hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                                        {notification.sender.username}
+                                                    </span>
+                                                    <span className="ml-1">{notification.text}</span>
+                                                </p>
+                                                <span className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                                    {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                                                </span>
+                                            </div>
+                                        </div>
+
+
+                                        {!notification.isRead && (
+                                            <div className="absolute right-4 top-10">
+                                                <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></div>
+                                            </div>
+                                        )}
+
+                                        <Space direction="vertical" className="absolute right-4 top-4 hidden group-hover:block">
+                                            <Space wrap>
+                                                <Dropdown
+                                                    menu={{
+
+                                                        items: itemsNotification(notification),
+                                                    }}
+                                                    placement="bottomRight"
+                                                >
+
+                                                    <BsThreeDots className="w-5 h-5 text-gray-500 hover:text-gray-700" />
+
+
+                                                </Dropdown>
+                                            </Space>
+                                        </Space>
+                                    </li>
+                                ))}
+                        </ul>
+                    </div>
+                    <div>{allnotification.length === 0 && (
+                        <div className="flex items-center justify-center  text-white text-lg font-semibold rounded-lg shadow-md transition transform hover:scale-105">
+                            Chưa có thông báo nào
+                        </div>
+
+                    )}</div>
+                    <div className="sticky bottom-0 z-10 bg-white dark:bg-gray-600 p-4 border-t border-gray-200 dark:border-gray-600">
+                        <a
+                            onClick={handlLoadMoreNotification}
+                            className="block w-full py-2.5 px-4 text-center text-sm font-medium bg-blue-50 dark:bg-[#00CDB8] text-slate-400 dark:text-white hover:bg-cyan-500 dark:hover:bg-cyan-400 transition-all duration-200 rounded-lg"
+                        >
+                            Xem thêm thông báo
+                        </a>
+                    </div>
+                </>
+            ),
+        },
+
+    ];
 
     return (
-        <>   <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-80 max-h-[32rem] overflow-hidden">
-            <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                    <MdOutlineNotificationsActive className="w-5 h-5" />
-                    Thông báo mới
-                </h2>
-            </div>
+        <>
+            <div className="bg-white dark:bg-gray-600 rounded-lg shadow-xl w-80 max-h-[32rem] overflow-hidden">
+                <div className="sticky top-0 z-10 bg-white dark:bg-gray-600 p-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <MdOutlineNotificationsActive className="w-5 h-5" />
+                        Thông báo mới
+                    </h2>
 
-            <div className="overflow-y-auto max-h-[24rem] scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
-                <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-                    {allnotification?.map((notification, index) => (
-                        <li
-                            key={`${notification._id}-${index}`}
-                            className={`group flex relative items-center space-x-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 ${!notification.isRead ? 'bg-blue-50/80 dark:bg-gray-700/30' : ''
-                                }`}
-                        >
-                            <div className="relative flex-shrink-0">
-                                <Avatar
-                                    size={50}
-                                    src={notification.sender.avatar.url}
-                                    icon={<UserOutlined />}
-                                    className="w-12 h-12 rounded-full object-cover ring-2 ring-white dark:ring-gray-700 shadow-sm group-hover:ring-blue-200 dark:group-hover:ring-gray-600 transition-all"
-                                />
+                    <ConfigProvider
+                        theme={{
+                            components: {
+                                Tabs: {
+                                    cardBg: '#4B5563',
+                                    cardActiveColor: '#ffff',
+                                    cardHoverColor: '#ffff',
+                                    inkBarColor: '#414B5A',
+                                    itemColor: '#ffff',
+                                },
+                            },
+                        }}
+                    >
+                        <Tabs
+                            type="card"
+                            items={items}
+                            animated={true}
 
-                                <div className="absolute -right-1 -bottom-1">
-                                    <div className="p-1 bg-white dark:bg-gray-800 rounded-full">
-                                        {renderIcon(notification.type)}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex-1 min-w-0">
-                                <div className="flex flex-col">
-                                    <p className="text-sm text-gray-900 dark:text-gray-100 leading-snug pr-6">
-                                        <span className="font-semibold hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                                            {notification.sender.username}
-                                        </span>
-                                        <span className="ml-1">{notification.text}</span>
-                                    </p>
-                                    <span className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                        {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
-                                    </span>
-                                </div>
-                            </div>
-
-
-                            {!notification.isRead && (
-                                <div className="absolute right-4 top-10">
-                                    <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse"></div>
-                                </div>
+                            renderTabBar={(props, DefaultTabBar) => (
+                                <DefaultTabBar {...props}>
+                                    {(node) => {
+                                        return (
+                                            <div
+                                                key={node.key}
+                                                onClick={() => handleClick(node.key)} // Thêm sự kiện onClick
+                                                style={{ cursor: 'pointer' }}
+                                            >
+                                                {node}
+                                            </div>
+                                        );
+                                    }}
+                                </DefaultTabBar>
                             )}
-
-                            {/* Dropdown 3 chấm */}
-                            <Space direction="vertical" className="absolute right-4 top-4 hidden group-hover:block">
-                                <Space wrap>
-                                    <Dropdown
-                                        menu={{
-
-                                            items: itemsNotification(notification),
-                                        }}
-                                        placement="bottomRight"
-                                    >
-
-                                        <BsThreeDots className="w-5 h-5 text-gray-500 hover:text-gray-700" />
-
-
-                                    </Dropdown>
-                                </Space>
-                            </Space>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <div>{allnotification.length === 0 && (
-                <div className="flex items-center justify-center  text-white text-lg font-semibold rounded-lg shadow-md transition transform hover:scale-105">
-                    Chưa có thông báo nào
+                        />
+                    </ConfigProvider>
                 </div>
 
-            )}</div>
-            <div className="sticky bottom-0 z-10 bg-white dark:bg-gray-800 p-4 border-t border-gray-200 dark:border-gray-700">
-                <a
-                    onClick={handlLoadMoreNotification}
-                    className="block w-full py-2.5 px-4 text-center text-sm font-medium bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-gray-600 transition-all duration-200 rounded-lg"
-                >
-                    Xem thêm thông báo
-                </a>
+
             </div>
-        </div>
 
         </>
     );

@@ -117,6 +117,10 @@ const Message = () => {
     const handleClickUpload = () => {
         setShowUpload(!showUpload);
     };
+    const handleUpdateGroup = (updatedGroup) => {
+        setSelectedConservation(updatedGroup);
+        console.log("xem đi đâ", updatedGroup)
+    };
     const handleChangeUpload = ({ fileList: newFileList, file }) => {
         if (file.status === 'error') {
             message.error(`${file.name} tải lên thất bại.`);
@@ -416,15 +420,19 @@ const Message = () => {
             message.error('Failed to upload voice message.');
         }
     };
-
+    const headerVariants = {
+        hidden: { opacity: 0, y: -20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+    };
     return (
-        <div className="w-full justify-center max-w-4xl mx-auto my-2 md:my-4 px-2 md:px-4">
 
-            <div className="w-full p-2 md:p-5 border border-gray-300 rounded-lg shadow-xl bg-gray">
-                <div className="flex flex-col md:flex-row h-[calc(100vh-180px)] ">
+        <div className="w-full max-w-4xl mx-auto mt-2 p-2 bg-white border border-gray-200 rounded-3xl shadow-lg transition-transform transform  hover:shadow-2xl">
+
+            <div className="w-full   rounded-lg shadow-xl ">
+                <div className="flex flex-col md:flex-row h-[calc(100vh-100px)]  ">
                     {/* Friends List */}
                     {(showFriendsList || !isMobile) && (
-                        <div className="w-full md:w-80 bg-[#eeeaea] border-b md:border-r border-base-300">
+                        <div className="w-full md:w-80 bg-[#eeeaea] border-b md:border-r border-base-300 min-h-0 rounded-2xl ">
                             {/* Header */}
                             <div className="p-4 border-b border-base-300 shadow-sm">
                                 <div className="flex items-center justify-between">
@@ -514,15 +522,15 @@ const Message = () => {
 
                                     return (
                                         <motion.div
-                                            className="bg-gradient-to-r from-[#FFFFFF] to-[#F0F0F0]rounded-lg shadow-2xl hover:shadow-1xl transition-shadow duration-300"
+                                            className="bg-gradient-to-r from-[#FFFFFF] to-[#F0F0F0]rounded-3xl shadow-2xl hover:bg-[#00CDB8] transition-shadow duration-300"
                                             variants={containerVariants}
                                             initial="hidden"
                                             animate="visible"
-                                            whileHover={{ scale: 1.05 }}
+
                                         >
                                             <div
                                                 key={conversation.conversationId}
-                                                className="flex items-center gap-3 p-3 md:p-4 cursor-pointer  border-b border-base-200"
+                                                className="flex items-center gap-3 p-3 md:p-4 cursor-pointer  border-b border-base-200 "
                                                 onClick={() => handleConversationSelect(conversation)}
                                             >
                                                 {/* Avatar */}
@@ -593,11 +601,18 @@ const Message = () => {
 
                     {/* Chat Area */}
                     {(!showFriendsList || !isMobile) && (
-                        <div className="flex-1 flex flex-col min-h-0 bg-[#F5F5F5 ] overflow-hidden">
+                        <div className="flex-1 flex flex-col min-h-0 bg-[#F5F5F5 ] overflow-hidden rounded-3xl">
 
                             {selectedConservation ? (
                                 <>
-                                    <div className="p-3 md:p-4 border-b border-base-300 bg-[#F5F5F5 ] flex-shrink-0">
+
+
+                                    <motion.div
+                                        className="p-3 md:p-4 border-b border-base-300 bg-[#F5F5F5] flex-shrink-0"
+                                        variants={headerVariants}
+                                        initial="hidden"
+                                        animate="visible"
+                                    >
                                         <div className="flex items-center justify-between gap-3">
                                             {isMobile && (
                                                 <button
@@ -610,11 +625,11 @@ const Message = () => {
 
                                             {/* Avatar */}
                                             <div className="avatar flex-shrink-0">
-                                                <div className="w-12 md:w-12 h-12 md:h-12   border-gray-200">
+                                                <div className="w-12 md:w-12 h-12 md:h-12 border-gray-200">
                                                     <Avatar
                                                         size={48}
                                                         alt="Current chat"
-                                                        className="object-cover "
+                                                        className="object-cover"
                                                         src={
                                                             selectedConservation.isGroup === true
                                                                 ? selectedConservation.avatar?.url
@@ -634,7 +649,9 @@ const Message = () => {
                                                 </h3>
                                                 <p className="text-xs md:text-sm">
                                                     {selectedConservation.isGroup === true
-                                                        ? selectedConservation.participants.some(participant => onlineUsers.includes(participant._id))
+                                                        ? selectedConservation.participants.some((participant) =>
+                                                            onlineUsers.includes(participant._id)
+                                                        )
                                                             ? <span className="text-green-500">Đang hoạt động</span>
                                                             : <span className="text-gray-500">Không hoạt động</span>
                                                         : onlineUsers.includes(selectedConservation.friend._id)
@@ -642,6 +659,7 @@ const Message = () => {
                                                             : <span className="text-gray-500">Không hoạt động</span>}
                                                 </p>
                                             </div>
+
                                             {/* Information Icon */}
                                             {selectedConservation.isGroup === true && (
                                                 <div className="flex items-center justify-center">
@@ -649,12 +667,16 @@ const Message = () => {
                                                         onClick={() => setModalInfor(true)}
                                                         className="text-2xl cursor-pointer transition-all duration-200 ease-in-out transform hover:text-blue-500 hover:scale-110"
                                                     />
-                                                    <InforConservation isOpen={modalInfor} onClose={() => setModalInfor(false)} group={selectedConservation} />
+                                                    <InforConservation
+                                                        isOpen={modalInfor}
+                                                        onClose={() => setModalInfor(false)}
+                                                        group={selectedConservation}
+                                                        onUpdateGroup={handleUpdateGroup}
+                                                    />
                                                 </div>
                                             )}
-
                                         </div>
-                                    </div>
+                                    </motion.div>
 
 
                                     <div className="flex-1 flex flex-col min-h-0 relative">
@@ -806,13 +828,13 @@ const Message = () => {
 
                                         )}
                                         <div className=" bottom-0 bg-[#F2DDDC] border-t border-base-300">
-                                            <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-2">
+                                            <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-2 justify-between">
 
                                                 {(!audioBlob && !isRecording) && (
 
                                                     <button
                                                         onClick={handleClickUpload}
-                                                        className="btn btn-ghost btn-sm md:btn-md btn-circle bg-white hover:bg-gray-100"
+                                                        className="btn btn-ghost  md:btn-md btn-circle bg-white hover:bg-gray-100"
                                                     >
                                                         <i className="bi bi-paperclip text-lg md:text-xl text-blue-500"></i>
                                                     </button>
@@ -825,7 +847,7 @@ const Message = () => {
 
 
                                                     <button
-                                                        className="btn btn-ghost btn-sm md:btn-md btn-circle bg-white hover:bg-gray-100 relative"
+                                                        className="btn btn-ghost  md:btn-md btn-circle bg-white hover:bg-gray-100 relative"
                                                         onClick={audioBlob ? clearAudio : (isRecording ? stopRecording : startRecording)}
                                                     >
                                                         {isRecording && (
@@ -860,18 +882,7 @@ const Message = () => {
                                                             width: "100%",
                                                         }}
                                                     >
-                                                        <div >
-                                                            <InputEmoji
-                                                                value={newMessage}
-                                                                onChange={setNewMessage}
-                                                                cleanOnEnter
 
-                                                                placeholder="Viết bình luận..."
-
-                                                                height={40}
-
-                                                            />
-                                                        </div>
                                                         <div className="flex-1 relative max-w-[320px]">
                                                             <div className="max-h-[100px]">
                                                                 <InputEmoji
@@ -888,7 +899,7 @@ const Message = () => {
                                                 )}
                                                 {!isRecording && (
                                                     <button
-                                                        className="btn btn-circle bg-gradient-to-r from-[#46A29E] to-[#64B5F6] hover:from-[#3C8C88] hover:to-[#42A5F5] text-white btn-sm md:btn-md"
+                                                        className="btn btn-circle bg-gradient-to-r from-[#46A29E] to-[#64B5F6] hover:from-[#3C8C88] hover:to-[#42A5F5] text-white md:btn-md"
                                                         onClick={sendMessage}
                                                         disabled={isSending}
                                                     >
@@ -906,7 +917,7 @@ const Message = () => {
                                 </>
                             ) : (
                                 <motion.div
-                                    className="flex-1 flex flex-col items-center justify-center space-y-6 p-8 bg-gradient-to-r from-[#dfe1e4] to-[#d1d8d8] rounded-lg shadow-2xl"
+                                    className="flex-1 flex flex-col items-center justify-center space-y-6 p-8 bg-gradient-to-r from-[#dfe1e4] to-[#d1d8d8] rounded-3xl  shadow-2xl"
                                     variants={containerVariants}
                                     initial="hidden"
                                     animate="visible"
@@ -970,7 +981,6 @@ const Message = () => {
                 </div>
             </div>
         </div >
-
 
     );
 };

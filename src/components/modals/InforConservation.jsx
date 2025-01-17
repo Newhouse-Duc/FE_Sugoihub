@@ -6,7 +6,7 @@ import { AiFillPicture, AiOutlineUser } from "react-icons/ai";
 import { MdOutlineGroupAdd, MdDeleteForever } from "react-icons/md";
 import { useSocket } from '../../socket/SocketContext';
 import { uploadImageChat, deleteConversation } from '../../redux/Chat/Chat.thunk';
-
+import { deleteMember, addMember } from '../../redux/Chat/Chat.sllice';
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -15,7 +15,7 @@ const getBase64 = (file) =>
         reader.onerror = (error) => reject(error);
     });
 
-const InforConservation = ({ isOpen, onClose, group }) => {
+const InforConservation = ({ isOpen, onClose, group, onUpdateGroup }) => {
     const { socket } = useSocket()
     const dispatch = useDispatch()
     const [loading, setLoading] = useState(false);
@@ -109,7 +109,7 @@ const InforConservation = ({ isOpen, onClose, group }) => {
             members
 
         }
-        console.log("xem member: ", data)
+        setMembers([])
         socket.emit("addmembers", data);
     }
     const handleDeleteMember = (id) => {
@@ -127,10 +127,13 @@ const InforConservation = ({ isOpen, onClose, group }) => {
     useEffect(() => {
 
         socket.on("newinforgroupchat", (data) => {
-            console.log("xem đi nào ", data)
+            console.log("hahahaha")
         });
 
     }, [])
+    const availableFriends = friends.filter(
+        (friend) => !group.participants.some((participant) => participant._id === friend._id)
+    );
 
     const items = [
         {
@@ -263,6 +266,7 @@ const InforConservation = ({ isOpen, onClose, group }) => {
                 }
             ] : []
         ),
+
         {
             key: '3',
             label: 'Thành viên',
@@ -285,7 +289,8 @@ const InforConservation = ({ isOpen, onClose, group }) => {
                                         .includes(input.toLowerCase())
                                 }
                             >
-                                {friends.map((friend) => (
+
+                                {availableFriends.map((friend) => (
                                     <Select.Option key={friend._id} value={friend._id}>
                                         <div className="flex items-center gap-3">
                                             <div className="flex-shrink-0">
@@ -375,16 +380,41 @@ const InforConservation = ({ isOpen, onClose, group }) => {
             setFileList([{ url: group.avatar.url, publicId: group.avatar.publicId }])
 
         }
-        socket.on("updatemember", (data) => {
+        const handleUpdateMember = (data) => {
+            if (data.deletemember) {
+                dispatch(deleteMember(data));
 
-            if (data) {
-                console.log("Thông báo mới data:", data);
+
+                const updatedParticipants = group.participants.filter(
+                    (participant) => participant._id !== data.deletemember
+                );
+
+
+                const updatedGroup = {
+                    ...group,
+                    participants: updatedParticipants,
+                };
+
+
+                onUpdateGroup(updatedGroup);
             }
+            if (data.members && data.members.length > 0) {
+                console.log("thêm đâu rồi ", data)
+                dispatch(addMember(data));
+                const updatedParticipants = [...group.participants, ...data.members];
+                const updatedGroup = {
+                    ...group,
+                    participants: updatedParticipants,
+                };
+                onUpdateGroup(updatedGroup);
+            }
+        };
+        socket.on("updatemember", handleUpdateMember);
+        return () => {
+            socket.off("updatemember", handleUpdateMember);
+        };
 
-        });
-
-
-    }, [group])
+    }, [group, dispatch, onUpdateGroup, socket]);
 
     return (
         <Modal

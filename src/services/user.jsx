@@ -118,6 +118,10 @@ export const handleLikePost = (data) => {
 export const handleUpdatePost = (id, data) => {
     return axios.put(`/post/${id}`, data)
 }
+export const handleGetHistoryPost = (id) => {
+    return axios.get(`/post/history/${id}`)
+}
+
 
 // chat 
 
@@ -173,12 +177,13 @@ export const handleLikeComment = (data) => {
 
 // notification 
 
-export const handleGetNotification = (skip, limit) => {
+export const handleGetNotification = (skip, limit, allnotify) => {
+    console.log("xem đi bên này : ", allnotify)
     return axios.get("/notification/getAll", {
         params: {
             limit: limit,
             skip: skip,
-
+            allnotify: allnotify,
         }
     })
 }

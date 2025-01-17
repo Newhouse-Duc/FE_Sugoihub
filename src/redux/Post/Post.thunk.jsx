@@ -6,7 +6,8 @@ import {
     handleAllPostGues,
     handleLikePost,
     handleDeleteMyPost,
-    handleUpdatePost
+    handleUpdatePost,
+    handleGetHistoryPost
 } from '../../services/user'
 
 export const newPost = createAsyncThunk(
@@ -82,6 +83,17 @@ export const updatePost = createAsyncThunk(
     async ({ id, data }, { rejectWithValue }) => {
         try {
             return await handleUpdatePost(id, data)
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+)
+
+export const historyPost = createAsyncThunk(
+    'post/history ',
+    async ({ id }, { rejectWithValue }) => {
+        try {
+            return await handleGetHistoryPost(id)
         } catch (error) {
             return rejectWithValue(error.response.data);
         }

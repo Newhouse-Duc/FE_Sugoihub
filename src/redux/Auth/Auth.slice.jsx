@@ -277,7 +277,7 @@ export const authSlice = createSlice({
 
             .addCase(listUser.fulfilled, (state, action) => {
                 state.isWait = false
-                console.log("xem danh sach: ", action.payload.data)
+
                 if (action.payload?.success) {
                     state.listUser = action.payload.data
                 }

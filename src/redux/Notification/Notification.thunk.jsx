@@ -5,9 +5,9 @@ import { handleGetNotification, handleMaskReadNotification, handleDeleteNotifica
 
 export const allNotification = createAsyncThunk(
     'notification/all',
-    async ({ skip, limit }, { rejectWithValue }) => {
+    async ({ skip, limit, allnotify }, { rejectWithValue }) => {
         try {
-            return await handleGetNotification(skip, limit);
+            return await handleGetNotification(skip, limit, allnotify);
         } catch (error) {
             return rejectWithValue(error.response.data);
         }

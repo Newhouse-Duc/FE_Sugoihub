@@ -7,13 +7,16 @@ import {
     likePost,
     deletePost,
     updatePost,
+    historyPost
 } from "./Post.thunk";
 const initialState = {
 
     allpost: [],
+    historypost: [],
     loading: false,
     loadingpost: false,
     error: null,
+
 
 
 }
@@ -145,6 +148,20 @@ export const post = createSlice({
 
             })
             .addCase(updatePost.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.error.message
+
+            })
+            //history post
+            .addCase(historyPost.pending, (state) => {
+                state.loading = true
+            })
+            .addCase(historyPost.fulfilled, (state, action) => {
+                state.loading = false
+                state.historypost = action.payload.data
+
+            })
+            .addCase(historyPost.rejected, (state, action) => {
                 state.loading = false
                 state.error = action.error.message
 

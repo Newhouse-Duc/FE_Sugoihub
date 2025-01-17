@@ -81,6 +81,12 @@ const CommentItem = ({
                             ))}
                         </div>
                     )}
+                    {comment.gif && (<img
+                        key={comment.gif.id}
+                        src={comment.gif.url}
+
+                        className="max-w-full  h-28 "
+                    />)}
 
                     <div className="flex items-center space-x-4 mt-3">
                         <div className="flex items-center">

@@ -43,6 +43,7 @@ const EditPost = ({ open, onClose, post }) => {
 
         setFileList(newFileList);
     };
+
     const uploadButton = (
         <button type="button">
             <PlusOutlined />
@@ -98,10 +99,7 @@ const EditPost = ({ open, onClose, post }) => {
             if (res.success) {
                 message.success("Sửa bài viết thành công");
                 onClose();
-                setPostContent('');
-                setVisibility('public');
-                setFileList([]);
-                setFileListVideo([]);
+
             }
         } catch (error) {
             message.error("Lỗi: " + error.message);
@@ -115,7 +113,7 @@ const EditPost = ({ open, onClose, post }) => {
     const [fileListvideo, setFileListVideo] = useState([]);
     useEffect(() => {
         if (post.videos && Array.isArray(post.videos)) {
-            console.log("có truyền được không: ", post)
+
             const updatedFileListvideo = post.videos.map(video => ({
                 url: video.url,
                 publicId: video.publicId,
@@ -203,7 +201,7 @@ const EditPost = ({ open, onClose, post }) => {
             }
         });
 
-        console.log("Danh sách file đã xóa: ", imagesDelete);
+
     };
 
     const [videosDelete, setVideosDelete] = useState([]);

@@ -71,6 +71,8 @@ const Home = () => {
                         <button onClick={() => dispatch(openModal('createPost'))} className="px-6 py-2.5 bg-[#00CDB8] hover:bg-[#00b5a2] text-white rounded-lg transition-colors duration-200 font-medium">
                             Đăng
                         </button>
+
+
                         <CreatePost isOpen={createpost} onClose={() => setCreatePost(false)} />
                     </div>
                 </motion.div>

@@ -15,12 +15,14 @@ import { FiEdit, FiChevronDown, FiTrash, FiShare, FiPlusSquare } from "react-ico
 import CreatePost from '../../components/modals/CreatePost';
 import logo from '../../assets/logo/Logo_SugoiHub.png'
 import { Link, useLocation } from 'react-router-dom';
-
+import { useSocket } from '../../socket/SocketContext';
 const HeaderUser = () => {
+    const { socket } = useSocket()
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [numbernotify, setNumberNotify] = useState(null)
     const [createPost, setOpenCreatePost] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -30,15 +32,33 @@ const HeaderUser = () => {
     const userinfor = useSelector((state) => state.auth.userinfor);
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
     const filteredUsers = searchTerm.trim() !== ''
         ? (listUser || []).filter((user) =>
             user.username.toLowerCase().includes(searchTerm.toLowerCase())
         )
         : [];
+
+    useEffect(() => {
+        const handleNotificationCount = () => {
+            const data = { id: userinfor._id };
+            message.success("có thông báo mới kìa ")
+            socket.emit("countnotification", data);
+        };
+        socket.on("notifipost", handleNotificationCount);
+        socket.on("notifilikepost", handleNotificationCount);
+        socket.on("notificommentpost", handleNotificationCount);
+    }, [socket])
+    useEffect(() => {
+        const data = { id: userinfor._id };
+
+        socket.emit("countnotification", data);
+
+        socket.on("notificationcount", (data) => {
+
+            setNumberNotify(data)
+        })
+
+    }, [socket])
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -85,19 +105,20 @@ const HeaderUser = () => {
     const handleCreatePost = () => {
         setOpenCreatePost(true)
     }
+
     const handleUserClick = (userId) => {
         setSearchTerm('');
         setShowResults(false);
         navigate(userId === userinfor._id ? "/account" : `/user/${userId}`);
     };
     const navItems = [
-        { icon: Home, path: '/home' },
-        { icon: Search, onClick: handleSearch },
-        { icon: BsFillPersonPlusFill, path: '/friendrequest' },
-        { icon: LuBadgePlus, onClick: handleCreatePost },
-        { icon: BsWechat, path: '/messages' },
+        { icon: Home, path: '/home', label: 'Trang chủ' },
+        { icon: Search, onClick: handleSearch, label: 'Tìm kiếm' },
+        { icon: BsFillPersonPlusFill, path: '/friendrequest', label: 'Kết bạn' },
+        { icon: LuBadgePlus, onClick: handleCreatePost, label: 'Tạo bài viết' },
+        { icon: BsWechat, path: '/messages', label: 'Tin nhắn' },
 
-        { icon: User, path: '/account' },
+        { icon: User, path: '/account', label: 'account' },
     ];
     const navigatelink = (navi) => {
         navigate(navi);
@@ -164,6 +185,7 @@ const HeaderUser = () => {
         }
     };
 
+
     return (
         <>
 
@@ -211,22 +233,27 @@ const HeaderUser = () => {
                         {/* Right Items (Notifications, User) */}
                         <div className="flex items-center space-x-4">
                             <Dropdown
-                                overlay={<Notifications />}
+                                dropdownRender={() => (
+                                    <div
+                                        style={{
+                                            width: '320px',
+                                            maxHeight: '80vh',
+                                            overflowY: 'auto',
+                                        }}
+                                    >
+                                        <Notifications />
+                                    </div>
+                                )}
                                 trigger={['click']}
                                 placement="bottomRight"
-                                arrow={{ pointAtCenter: true }}
-                                getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                                overlayStyle={{
-                                    width: '320px',
-                                    maxHeight: '80vh',
-                                }}
-                                open={isDropdownOpen}
-                                onOpenChange={(open) => setIsDropdownOpen(open)}
+
+
+
                             >
-                                <button className="btn btn-ghost btn-circle" onClick={toggleDropdown}>
+                                <button className="btn btn-ghost btn-circle" >
                                     <div className="indicator">
                                         <BsBell className='w-8 h-8' />
-                                        {/* <span className="badge badge-sm badge-primary indicator-item">3</span> */}
+                                        <span className="badge badge-sm bg-[#00CDB8] indicator-item ">{numbernotify || 0}</span>
                                     </div>
                                 </button>
                             </Dropdown>
@@ -247,10 +274,10 @@ const HeaderUser = () => {
                                     style={{ originY: "top", translateX: "-50%" }}
                                     className="flex flex-col gap-2 p-2 rounded-lg bg-white  shadow-xl absolute top-[120%] left-[10%] w-30 overflow-hidden  "
                                 >
-                                    <Option setOpen={setOpen} Icon={FiEdit} text="Trang cá nhân" onClick={() => navigatelink("/account")} />
-                                    <Option setOpen={setOpen} Icon={IoSettingsOutline} text="Cài đặt tài khoản" onClick={() => navigatelink("/setting")} />
+                                    <Option key="account" setOpen={setOpen} Icon={FiEdit} text="Trang cá nhân" onClick={() => navigatelink("/account")} />
+                                    <Option key="settings" setOpen={setOpen} Icon={IoSettingsOutline} text="Cài đặt tài khoản" onClick={() => navigatelink("/setting")} />
 
-                                    <Option setOpen={setOpen} Icon={FiTrash} text="Đăng xuất" onClick={handleLogout} />
+                                    <Option key="logout" setOpen={setOpen} Icon={FiTrash} text="Đăng xuất" onClick={handleLogout} />
                                 </motion.ul>
                             </motion.div>
                         </div>
@@ -277,25 +304,27 @@ const HeaderUser = () => {
                     ))}
                     {/* Add Notification Dropdown for Mobile */}
                     <Dropdown
-                        overlay={<Notifications />}
+                        dropdownRender={() => (
+                            <div
+                                style={{
+                                    width: '320px',
+                                    maxHeight: '80vh',
+                                    overflowY: 'auto',
+                                }}
+                            >
+                                <Notifications />
+                            </div>
+                        )}
                         trigger={['click']}
                         placement="bottomRight"
-                        arrow={{ pointAtCenter: true }}
-                        getPopupContainer={(triggerNode) => triggerNode.parentNode}
-                        overlayStyle={{
-                            width: '320px',
-                            maxHeight: '80vh',
-                            marginTop: '8px'
-                        }}
-                        open={isDropdownOpen}
-                        onOpenChange={(open) => setIsDropdownOpen(open)}
+
                     >
                         <button
-                            className={`p-2 rounded-full ${isDropdownOpen ? 'text-black bg-gray-100' : 'text-gray-500'}`}
-                            onClick={toggleDropdown}
+                            className={` rounded-full ${isDropdownOpen ? 'text-black bg-gray-100' : 'text-gray-500'} indicator`}
+
                         >
                             <BsBell className="w-8 h-8" />
-
+                            <span className="badge badge-sm bg-[#00CDB8] indicator-item ">{numbernotify || 0}</span>
                         </button>
                     </Dropdown>
                     <Link
@@ -331,8 +360,8 @@ const HeaderUser = () => {
                             className="fixed bottom-16 right-4 bg-white rounded-lg shadow-lg w-48 overflow-hidden"
                         >
                             <ul className="flex flex-col gap-2 p-2">
-                                <Option Icon={FiEdit} text="Cài đặt" onClick={() => navigatelink("/setting")} />
-                                <Option Icon={FiTrash} text="Đăng xuất" onClick={handleLogout} />
+                                <Option key="setting" Icon={FiEdit} text="Cài đặt" onClick={() => navigatelink("/setting")} />
+                                <Option key="logout" Icon={FiTrash} text="Đăng xuất" onClick={handleLogout} />
                             </ul>
                         </motion.div>
                     )}

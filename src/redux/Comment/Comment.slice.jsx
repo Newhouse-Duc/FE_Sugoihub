@@ -34,7 +34,7 @@ export const comment = createSlice({
             })
             .addCase(newCommentPost.fulfilled, (state, action) => {
                 state.loading = false
-                // addComment(action.payload.data)
+                state.comment = [...state.comment, ...action.payload.data]
 
             })
             .addCase(newCommentPost.rejected, (state, action) => {

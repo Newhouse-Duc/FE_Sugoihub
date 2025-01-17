@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { GiphyFetch } from '@giphy/js-fetch-api';
 import { Grid } from '@giphy/react-components';
 import { Button } from 'antd';
-
+import { motion } from 'framer-motion';
 const gf = new GiphyFetch('UYTU8tqOjlcaAaw1AoGp4sJFnGr2Rwsv');
 
-const Giphy = () => {
+const Giphy = ({ onGifSelect }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [gifs, setGifs] = useState([]);
-    const [selectedGif, setSelectedGif] = useState(null); // State để lưu GIF được chọn
+    const [selectedGif, setSelectedGif] = useState(null);
 
     const fetchGifs = async (offset) => {
         return gf.search(searchTerm, { offset, limit: 10 });
@@ -22,12 +22,15 @@ const Giphy = () => {
     };
     const handleClear = () => {
         setSelectedGif(null)
+        onGifSelect(null);
+
     }
 
     const handleGifClick = (gif, event) => {
         event.preventDefault();
-        setSelectedGif({ id: gif.id, url: gif.images.original.url, title: gif.title });
-        console.log("GIF được chọn:", gif);
+        const selected = { id: gif.id, url: gif.images.original.url };
+        setSelectedGif(selected);
+        onGifSelect(selected);
     };
     useEffect(() => {
         if (searchTerm) {
@@ -75,19 +78,34 @@ const Giphy = () => {
 
 
                         </div>
-                        <p>Tiêu đề: {selectedGif.title}</p>
+
 
                     </div>
                 )}
-                <form onSubmit={handleSearch}>
-                    <input
-                        type="text"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Tìm kiếm GIF..."
-                        className='bg-slate-300'
-                    />
-                    <button type="submit" className='bg-white border border-spacing-1 border-x-8'>Tìm kiếm</button>
+                <form onSubmit={handleSearch} className="flex items-center gap-2">
+
+                    <div className="relative flex-1">
+                        <input
+                            type="text"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            placeholder="Tìm kiếm GIF..."
+                            className="w-full px-4 py-2 pr-10 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                        />
+
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <i className="bi bi-search text-gray-400"></i>
+                        </div>
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-800 focus:ring-offset-2 transition-all"
+                    >
+                        Tìm kiếm
+                    </button>
+
                 </form>
             </div>
         </>

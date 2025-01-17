@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Modal, message, Upload, Image, Input, Avatar } from 'antd';
-import { SmileOutlined, CameraOutlined, SendOutlined } from '@ant-design/icons';
+import { SmileOutlined, CameraOutlined, SendOutlined, CloseCircleTwoTone } from '@ant-design/icons';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Parallax, FreeMode, EffectFade } from 'swiper/modules';
 import { newCommentPost } from '../../redux/Comment/Comment.thunk';
@@ -18,6 +18,11 @@ const CommentPost = ({ isOpen, onClose, post }) => {
     const [showUpload, setShowUpload] = useState(false);
     const [fileList, setFileList] = useState([]);
     const userinfor = useSelector((state) => state.auth.userinfor)
+    const [selectedGif, setSelectedGif] = useState(null);
+
+    const handleGifSelect = (gif) => {
+        setSelectedGif(gif);
+    };
     const handleClickUpload = () => {
         setShowUpload(!showUpload);
         setShowGif(false)
@@ -44,13 +49,21 @@ const CommentPost = ({ isOpen, onClose, post }) => {
             const data = new FormData();
             data.append("content", text);
             data.append("author", userinfor._id);
-            data.append("postId", post._id);
+            data.append("postId", post._id); selectedGif
+            if (selectedGif) {
 
+                const gifData = {
+                    url: selectedGif.url,
+                    id: selectedGif.id
+                };
+                data.append("gif", JSON.stringify(gifData));
+            }
             fileList.forEach((file) => {
                 if (file.originFileObj) {
                     data.append("images", file.originFileObj);
                 }
             });
+
             for (let [key, value] of data.entries()) {
                 console.log(`${key}:`, value);
             }
@@ -68,13 +81,19 @@ const CommentPost = ({ isOpen, onClose, post }) => {
                     type: "POST_COMMENT",
                     text: "đã bình luận về bài viết của bạn"
                 };
-                socket.emit("commentpost", newcomment);
+                if (post.user._id !== userinfor._id) {
+                    socket.emit("commentpost", newcomment);
 
-                message.success('Đăng bình luận thành công');
+                    message.success('Đăng bình luận thành công');
+                }
+
+
 
 
                 setFileList([]);
                 onClose();
+                setSelectedGif(null);
+                setShowGif(false);
                 setText("")
             }
 
@@ -111,7 +130,7 @@ const CommentPost = ({ isOpen, onClose, post }) => {
             centered
             getContainer={() => document.body}
             open={isOpen}
-            onCancel={onClose}
+            onCancel={() => onClose()}
             maskClosable={false}
 
             closeIcon={null}
@@ -120,8 +139,10 @@ const CommentPost = ({ isOpen, onClose, post }) => {
             footer={[
                 <Button
                     key="cancel"
-                    onClick={onClose}
-                    className="hover:bg-gray-100 rounded-md px-4 py-2 text-gray-600"
+                    type="dashed"
+                    onClick={() => onClose()}
+                    icon={<CloseCircleTwoTone />}
+                    className="hover:bg-gray-100 rounded-md px-4 py-2 text-gray-600 mr-2"
                 >
                     Hủy
                 </Button>,
@@ -209,7 +230,7 @@ const CommentPost = ({ isOpen, onClose, post }) => {
                             <SwiperSlide key={`video-${index}`}>
                                 <div className="title w-auto h-auto mx-auto" data-swiper-parallax="-300">
                                     <video
-                                        ref={videoRef}
+
                                         controls
                                         style={{
                                             width: '100%',
@@ -261,22 +282,15 @@ const CommentPost = ({ isOpen, onClose, post }) => {
 
                     {/* Comment Input */}
                     <div className="mt-4  items-center gap-4  flex-1 relative max-w-[600px]  ">
-                        <div className=" items-center gap-2 bg-gray-100 rounded-lg p-2 ">
+                        <div className=" items-center gap-2  rounded-lg p-2 ">
 
 
                             {showgif && (
                                 <div className="relative bottom-full mb-2 w-full ">
-                                    <Giphy />
+                                    <Giphy onGifSelect={handleGifSelect} />
                                 </div>
                             )}
-                            <div className="flex gap-2">
-                                <Button onClick={handleClickUpload} className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
-                                    📸 <span>Ảnh</span>
-                                </Button>
-                                <Button onClick={handleShowGif} className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
-                                    🕹️ <span>GiF</span>
-                                </Button>
-                            </div>
+
                             <div className="flex-1 relative max-w-[600px] ">
                                 <div className="max-h-[100px]">
                                     <InputEmoji
@@ -287,7 +301,16 @@ const CommentPost = ({ isOpen, onClose, post }) => {
                                         placeholder="Viết bình luận..."
                                         height={40}
                                     />
+                                    <div className="flex gap-2 ml-4">
+                                        <Button onClick={handleClickUpload} className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+                                            📸
+                                        </Button>
+                                        <Button onClick={handleShowGif} className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+                                            🕹️
+                                        </Button>
+                                    </div>
                                 </div>
+
                             </div>
 
                         </div>
