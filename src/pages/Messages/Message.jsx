@@ -744,7 +744,7 @@ const Message = () => {
                                                                             />
                                                                         ))}
                                                                         {chat.voices && (
-                                                                            <audio src={chat.voices.url} controls autoPlay className="h-8 w-44">
+                                                                            <audio src={chat.voices.url} controls className="h-8 w-44">
                                                                                 Trình duyệt của bạn không hỗ trợ
                                                                             </audio>
                                                                         )}
@@ -766,7 +766,9 @@ const Message = () => {
                                                                         />
                                                                     ))}
                                                                     {chat.voices && (
-                                                                        <div>Tin nhắn ghi âm </div>
+                                                                        <audio src={chat.voices.url} controls className="h-8 w-44">
+                                                                            Trình duyệt của bạn không hỗ trợ
+                                                                        </audio>
                                                                     )}
                                                                     <div class="text-black">{chat.content}</div>
                                                                 </motion.div>

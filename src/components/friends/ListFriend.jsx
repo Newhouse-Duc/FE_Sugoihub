@@ -66,7 +66,7 @@ const ListFriend = ({ listfriend }) => {
                             whileTap={{ scale: 0.95 }}
                         >
                             <motion.img
-                                src={friend.avatar?.url || '/api/placeholder/40/40'}
+                                src={friend.avatar?.url || 'https://avatar.iran.liara.run/public/4'}
                                 alt={friend.username}
                                 className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
                                 whileHover={{

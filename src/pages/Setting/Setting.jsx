@@ -8,6 +8,7 @@ import { validationDateSchema } from '../../validates/validates';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { changepassword } from '../../redux/Auth/Auth.thunk';
 import { motion } from 'framer-motion';
+import { userprofile } from '../../redux/Auth/Auth.thunk';
 const { Option } = Select;
 const getBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -158,6 +159,7 @@ const Setting = () => {
 
                     formik.resetForm();
                     setNewRemoveAvatar(null)
+                    await dispatch(userprofile()).unwrap();
                 } else {
                     message.error('Cập nhật không thành công.');
                 }

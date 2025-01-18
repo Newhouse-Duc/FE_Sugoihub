@@ -81,7 +81,7 @@ const Account = () => {
                     >
                         <Avatar
                             size={120}
-                            src={userinfor?.avatar?.url}
+                            src={userinfor?.avatar?.url || "https://avatar.iran.liara.run/public/4"}
                             icon={<UserOutlined />}
                             alt="User Avatar"
                             className="border-4 border-white shadow-lg"

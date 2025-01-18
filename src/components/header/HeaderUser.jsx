@@ -403,7 +403,7 @@ const HeaderUser = () => {
                                 >
                                     {user.avatar ? (
                                         <img
-                                            src={user.avatar.url}
+                                            src={user.avatar.url || "https://avatar.iran.liara.run/public/4"}
                                             alt={user.username}
                                             className="w-10 h-10 rounded-full object-cover"
                                         />

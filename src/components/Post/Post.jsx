@@ -82,7 +82,7 @@ const Post = ({ post, onCommentClick, onViewPostClick }) => {
                         <div className="flex items-center space-x-4">
                             <div className="relative">
                                 <img
-                                    src={post.user.avatar?.url || "https://via.placeholder.com/150"}
+                                    src={post.user.avatar?.url || "https://avatar.iran.liara.run/public/4"}
                                     alt="User avatar"
                                     className="w-14 h-14 rounded-full object-cover ring-4 ring-blue-200 shadow-lg"
                                 />
