@@ -136,7 +136,7 @@ const Toast = ({ data, onClose, index, total }) => {
                         </div>
                     </div>
 
-                    {/* Content */}
+
                     <div className="flex-1 space-y-1">
                         <div className="flex items-center gap-2">
                             <p className="text-base font-medium bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
@@ -150,7 +150,6 @@ const Toast = ({ data, onClose, index, total }) => {
                         </p>
                     </div>
 
-                    {/* Close button */}
                     <button
                         onClick={() => onClose(data.id)}
                         className="flex-shrink-0 p-1.5 rounded-full 

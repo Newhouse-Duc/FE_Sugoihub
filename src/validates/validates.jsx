@@ -1,8 +1,8 @@
 import * as Yup from 'yup';
 
 export const validateLoginSchema = Yup.object({
-    email: Yup.string().email('Email không hợp lệ').required("Hãy nhập email"),
-    password: Yup.string().min(6).required("Hãy nhập password hợp lệ")
+    email: Yup.string().email('Email đăng nhập không hợp lệ ').required("Hãy nhập email"),
+    password: Yup.string().min(6, 'Mật khẩu tối thiểu 6 kí tự').required("Hãy nhập password hợp lệ"),
 });
 
 

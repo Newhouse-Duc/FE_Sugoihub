@@ -111,23 +111,74 @@ const EditPost = ({ open, onClose, post }) => {
 
 
     const [fileListvideo, setFileListVideo] = useState([]);
+    // useEffect(() => {
+    //     if (post.videos && Array.isArray(post.videos)) {
+
+    //         const updatedFileListvideo = post.videos.map(video => ({
+    //             url: video.url,
+    //             publicId: video.publicId,
+    //         }));
+    //         setFileListVideo(updatedFileListvideo)
+    //     }
+    //     if (post.images && Array.isArray(post.images)) {
+    //         const updatedFileList = post.images.map(image => ({
+    //             url: image.url,
+    //             publicId: image.publicId,
+    //         }));
+    //         setFileList(updatedFileList);
+    //     }
+    // }, [post])
     useEffect(() => {
         if (post.videos && Array.isArray(post.videos)) {
-
             const updatedFileListvideo = post.videos.map(video => ({
+                uid: video.publicId, // Thêm uid để xác định video
                 url: video.url,
                 publicId: video.publicId,
+                name: video.url.split('/').pop(), // Tên file video
+                status: 'done', // Đánh dấu là đã upload thành công
             }));
-            setFileListVideo(updatedFileListvideo)
+            setFileListVideo(updatedFileListvideo);
         }
         if (post.images && Array.isArray(post.images)) {
             const updatedFileList = post.images.map(image => ({
+                uid: image.publicId,
                 url: image.url,
                 publicId: image.publicId,
+                name: image.url.split('/').pop(),
+                status: 'done',
             }));
             setFileList(updatedFileList);
         }
-    }, [post])
+    }, [post]);
+    // const handleChangeVideo = ({ fileList: newFileListVideo }) => {
+    //     const isLtMaxSize = newFileListVideo.every(file => {
+    //         if (file.originFileObj) {
+    //             return file.originFileObj.size / 1024 / 1024 < 20;
+    //         }
+    //         return true;
+    //     });
+
+    //     if (!isLtMaxSize) {
+    //         message.error('Video phải nhỏ hơn 20MB!');
+    //         return;
+    //     }
+    //     const updatedList = newFileListVideo.map((file) => {
+    //         if (!file.originFileObj) return file;
+
+
+    //         const isValidFormat = ['video/mp4', 'video/quicktime'].includes(file.originFileObj.type);
+    //         if (!isValidFormat) {
+    //             message.error('Chỉ chấp nhận file MP4 hoặc MOV!');
+    //             return null;
+    //         }
+
+    //         if (!file.url && !file.preview) {
+    //             file.preview = URL.createObjectURL(file.originFileObj);
+    //         }
+    //         return file;
+    //     }).filter(Boolean);
+    //     setFileListVideo(updatedList);
+    // };
     const handleChangeVideo = ({ fileList: newFileListVideo }) => {
         const isLtMaxSize = newFileListVideo.every(file => {
             if (file.originFileObj) {
@@ -140,9 +191,9 @@ const EditPost = ({ open, onClose, post }) => {
             message.error('Video phải nhỏ hơn 20MB!');
             return;
         }
+
         const updatedList = newFileListVideo.map((file) => {
             if (!file.originFileObj) return file;
-
 
             const isValidFormat = ['video/mp4', 'video/quicktime'].includes(file.originFileObj.type);
             if (!isValidFormat) {
@@ -155,6 +206,7 @@ const EditPost = ({ open, onClose, post }) => {
             }
             return file;
         }).filter(Boolean);
+
         setFileListVideo(updatedList);
     };
     const beforeUpload = (file) => {
@@ -205,8 +257,19 @@ const EditPost = ({ open, onClose, post }) => {
     };
 
     const [videosDelete, setVideosDelete] = useState([]);
-    const handleDeleteVideo = (file) => {
+    // const handleDeleteVideo = (file) => {
 
+    //     setVideosDelete((prevVideos) => {
+    //         if (Array.isArray(prevVideos)) {
+    //             return [...prevVideos, file.publicId];
+    //         } else {
+    //             return [file.publicId];
+    //         }
+    //     });
+
+    //     console.log("Danh sách file đã xóa: ", videosDelete);
+    // };
+    const handleDeleteVideo = (file) => {
         setVideosDelete((prevVideos) => {
             if (Array.isArray(prevVideos)) {
                 return [...prevVideos, file.publicId];
@@ -215,7 +278,8 @@ const EditPost = ({ open, onClose, post }) => {
             }
         });
 
-        console.log("Danh sách file đã xóa: ", videosDelete);
+        const updatedFileList = fileListvideo.filter((item) => item.uid !== file.uid);
+        setFileListVideo(updatedFileList);
     };
     return (
         <>
@@ -370,11 +434,11 @@ const EditPost = ({ open, onClose, post }) => {
                         >
                             <Button disabled={fileListvideo.length >= 1}>Upload Video</Button>
                         </Upload>
-                        {fileListvideo.length > 0 && fileListvideo[0].preview && (
-                            <div className="mt-4">
-                                <video controls width="100%" src={fileListvideo[0].preview}></video>
+                        {fileListvideo.map((file) => (
+                            <div key={file.uid} className="mt-4">
+                                <video controls width="100%" src={file.url || file.preview}></video>
                             </div>
-                        )}
+                        ))}
                     </div>
                 )}
             </Modal>

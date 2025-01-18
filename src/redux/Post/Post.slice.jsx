@@ -28,7 +28,8 @@ export const post = createSlice({
 
 
         removePostById: (state, action) => {
-            state.allpost = state.allpost.filter(post => post.id !== action.payload.id);
+            console.log("xem nào : ", action.payload.id)
+            state.allpost = state.allpost.filter(post => post._id !== action.payload._id);
         },
 
 
@@ -42,7 +43,7 @@ export const post = createSlice({
             })
             .addCase(newPost.fulfilled, (state, action) => {
                 state.loading = false
-
+                // state.allpost = [...state.allpost,... action.payload]
 
             })
             .addCase(newPost.rejected, (state, action) => {

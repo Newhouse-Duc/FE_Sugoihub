@@ -892,7 +892,7 @@ const Message = () => {
                                                                     onChange={setNewMessage}
                                                                     cleanOnEnter
                                                                     placeholder="Nhập tin nhắn của bạn"
-
+                                                                    onEnter={sendMessage}
                                                                 />
                                                             </div>
                                                         </div>

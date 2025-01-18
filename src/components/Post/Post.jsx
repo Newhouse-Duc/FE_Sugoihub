@@ -11,6 +11,7 @@ import { Dropdown, Modal, Button, Skeleton, Card } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import EditPost from '../modals/EditPost';
 import { deletePost } from '../../redux/Post/Post.thunk';
+import { removePostById } from '../../redux/Post/Post.slice';
 import HistoryEditPost from '../modals/HistoryEditPost';
 
 const Post = ({ post, onCommentClick, onViewPostClick }) => {
@@ -37,6 +38,7 @@ const Post = ({ post, onCommentClick, onViewPostClick }) => {
         const res = await dispatch(deletePost({ id: post._id })).unwrap();
         if (res.success) {
             message.success("Đã xóa bài viết thành công.");
+            dispatch(removePostById(post))
         }
         setModalDelete(false);
     }
@@ -185,7 +187,6 @@ const Post = ({ post, onCommentClick, onViewPostClick }) => {
                     <ActionPost post={post} onCommentClick={onCommentClick} />
                 </div>
 
-                {/* Modals - Styled */}
                 <Modal
                     title={
                         <div className="text-xl font-semibold text-center text-gray-800 py-4">
