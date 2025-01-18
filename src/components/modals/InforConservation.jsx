@@ -28,6 +28,7 @@ const InforConservation = ({ isOpen, onClose, group, onUpdateGroup }) => {
     const [previewImage, setPreviewImage] = useState('');
     const userinfor = useSelector((state) => state.auth.userinfor)
     const friends = useSelector((state) => state.friendship.friends)
+    const conversation = useSelector((state) => state.chat.conversation)
     const handlePreview = async (file) => {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
@@ -61,11 +62,15 @@ const InforConservation = ({ isOpen, onClose, group, onUpdateGroup }) => {
             });
 
             let avatar = null;
+
             if (data.has("images")) {
 
                 const response = await dispatch(uploadImageChat({ data })).unwrap();
                 if (response.success) {
                     avatar = response.data;
+
+
+
                 }
             }
 
@@ -81,6 +86,9 @@ const InforConservation = ({ isOpen, onClose, group, onUpdateGroup }) => {
             socket.emit("updategroupchat", updateData);
 
             setLoading(false);
+            setAvatarDelete({})
+            onClose()
+            setFileList([])
             message.success("Thay đổi thành công");
 
         } catch (error) {
@@ -122,8 +130,17 @@ const InforConservation = ({ isOpen, onClose, group, onUpdateGroup }) => {
         socket.emit("deletemember", data)
     }
     useEffect(() => {
-        setGroupName(group.name);
+        if (group) {
+            setGroupName(group.name); // Cập nhật tên nhóm từ group
+            setFileList(group.avatar ? [{ url: group.avatar.url, publicId: group.avatar.publicId }] : []); // Cập nhật fileList từ group.avatar
+            setNewAdmin(group.admin); // Cập nhật admin từ group
+            setMembers([]); // Reset members khi mở modal
+            setAvatarDelete({}); // Reset avatardelete
+            setPreviewOpen(false); // Reset previewOpen
+            setPreviewImage(''); // Reset previewImage
+        }
     }, [group]);
+
     useEffect(() => {
 
         socket.on("newinforgroupchat", (data) => {
@@ -378,7 +395,6 @@ const InforConservation = ({ isOpen, onClose, group, onUpdateGroup }) => {
 
         if (group.avatar) {
             setFileList([{ url: group.avatar.url, publicId: group.avatar.publicId }])
-
         }
         const handleUpdateMember = (data) => {
             if (data.deletemember) {
@@ -399,7 +415,7 @@ const InforConservation = ({ isOpen, onClose, group, onUpdateGroup }) => {
                 onUpdateGroup(updatedGroup);
             }
             if (data.members && data.members.length > 0) {
-                console.log("thêm đâu rồi ", data)
+
                 dispatch(addMember(data));
                 const updatedParticipants = [...group.participants, ...data.members];
                 const updatedGroup = {
@@ -414,17 +430,29 @@ const InforConservation = ({ isOpen, onClose, group, onUpdateGroup }) => {
             socket.off("updatemember", handleUpdateMember);
         };
 
-    }, [group, dispatch, onUpdateGroup, socket]);
-
+    }, [group, dispatch, onUpdateGroup, socket, conversation]);
+    const handleCloseModal = () => {
+        // Reset các state về giá trị ban đầu từ group
+        if (group) {
+            setGroupName(group.name);
+            setFileList(group.avatar ? [{ url: group.avatar.url, publicId: group.avatar.publicId }] : []);
+            setNewAdmin(group.admin);
+            setMembers([]);
+            setAvatarDelete({});
+            setPreviewOpen(false);
+            setPreviewImage('');
+        }
+        onClose(); // Đóng modal
+    };
     return (
         <Modal
             title="thông tin cuộc trò chuyện nhóm"
             centered
             maskClosable
-            getContainer={false}
+            getContainer={() => document.body}
             open={isOpen}
-            closeIcon={() => onClose()}
-            onCancel={() => onClose()}
+            closeIcon={() => handleCloseModal()}
+            onCancel={() => handleCloseModal()}
             width={800}
             footer={null}
 

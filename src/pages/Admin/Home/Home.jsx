@@ -282,6 +282,20 @@ const Home = () => {
                                         />
                                     </div>
                                 ))}
+                                {dataPost?.topPosts?.videos?.map((video) => (
+                                    <div
+                                        key={video._id}
+                                        className="w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+                                    >
+                                        <video
+                                            src={video.url}
+                                            alt="Post content"
+                                            controls
+                                            className="w-full h-full object-cover"
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                ))}
                             </div>
 
                             <div className="flex items-center space-x-6 text-gray-600 pt-2 border-t">

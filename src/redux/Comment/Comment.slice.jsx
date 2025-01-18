@@ -63,7 +63,27 @@ export const comment = createSlice({
             })
             .addCase(replyComment.fulfilled, (state, action) => {
                 state.loading = false
+                console.log("xem a", action.payload.data)
+                state.replyComment = [...state.replyComment, ...action.payload.data.replie];
+                const replyCount = action.payload.data.firstReplyCount.replyCount;
+                const targetId = action.payload.data.firstReplyCount._id;
+                const updateComment = (comments) => {
+                    return comments.map((comment) => {
 
+                        if (comment._id === targetId) {
+
+                            return {
+                                ...comment,
+                                replyCount: replyCount,
+                            };
+                        }
+                        return comment;
+                    });
+                };
+
+
+                state.comment = updateComment(state.comment);
+                state.replyComment = updateComment(state.replyComment);
             })
             .addCase(replyComment.rejected, (state, action) => {
                 state.loading = false
@@ -78,7 +98,7 @@ export const comment = createSlice({
                 state.loading = false
                 state.replyComment = [...state.replyComment, ...action.payload.data];
 
-                // state.replyComment = action.payload.data;
+
 
 
             })

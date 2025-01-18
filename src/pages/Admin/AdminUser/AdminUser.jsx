@@ -1,12 +1,22 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { allUser, banUser } from '../../../redux/Admin/Admin_user/Admin_user.thunk';
 import { updateUserBan } from '../../../redux/Admin/Admin_user/Admin_user.slice';
-import { Switch, Table, Tag, Avatar, Popconfirm, Button } from 'antd';
+import { Switch, Table, Tag, Avatar, Popconfirm, Button, Select, Input } from 'antd';
+import UserDetail from '../../../components/modals/UserDetail'
+
+
+
+
+const { Search } = Input;
+const { Option } = Select;
 const AdminUser = () => {
     const dispatch = useDispatch();
     const user = useSelector((state) => state.adminUser.user);
     const loading = useSelector((state) => state.adminUser.loading)
+    const [userdetail, setUserDetail] = useState(false)
+    const [selecteduser, setSelectedUser] = useState(null)
+    const [selectedisactive, setSelectedIsActive] = useState(null)
     useEffect(() => {
         dispatch(allUser());
     }, [dispatch]);
@@ -20,14 +30,18 @@ const AdminUser = () => {
 
     };
 
+    const handleviewuser = (user) => {
+        setSelectedUser(user);
+        setUserDetail(true)
+    }
 
-
-
+    const [searchText, setSearchText] = useState('');
     const columns = [
         {
             title: "Ảnh đại diện",
             dataIndex: "avatar",
             key: "avatar",
+            align: 'center',
             render: (avatar) =>
                 avatar?.url ? <Avatar src={avatar.url} /> : <Avatar icon="user" />,
         },
@@ -35,22 +49,39 @@ const AdminUser = () => {
             title: "Tên người dùng",
             dataIndex: "username",
             key: "username",
+            align: 'center',
             render: (text) => <a>{text}</a>,
         },
         {
             title: "Email",
             dataIndex: "email",
             key: "email",
+            width: '250px',
+        },
+        {
+            title: "Tổng bài viết",
+            dataIndex: "totalPosts",
+            key: "totalPosts",
+            align: 'center',
+        },
+        {
+            title: "Số bạn bè",
+            dataIndex: "friends",
+            key: "friends",
+            render: (value) => <a>{value?.length}</a>,
+            align: 'center',
         },
         {
             title: "Ngày sinh",
             dataIndex: "birthDate",
             key: "birthDate",
+
             render: (date) => new Date(date).toLocaleDateString("vi-VN"),
         },
         {
             title: "Trạng thái hoạt động",
             dataIndex: "isActive",
+            align: 'center',
             key: "isActive",
             render: (isActive) => (
                 <Tag color={isActive ? "green" : "volcano"}>
@@ -84,7 +115,8 @@ const AdminUser = () => {
             fixed: 'right',
             render: (text, record) => (
                 <div style={{ display: 'flex', gap: '8px' }}>
-                    <Button type="primary" size="small"><i className="bi bi-eye"></i></Button>
+                    <Button type="primary" size="small"><i className="bi bi-eye" onClick={() => handleviewuser(record)}></i></Button>
+
                     <Popconfirm
                         title="Xóa người dùng"
                         description="Bạn có muốn xóa người dùng  "
@@ -98,24 +130,45 @@ const AdminUser = () => {
         },
     ];
 
-    const data = useMemo(() =>
-        user.map((item) => ({
-            key: item._id,
-            avatar: item.avatar,
-            username: item.username,
-            email: item.email,
-            birthDate: item.birthDate,
-            isActive: item.isActive,
-            ban: item.ban,
-            createdAt: item.createdAt,
-        })),
-        [user]
-    );
 
+    const filteredProducts = (user || []).filter((u) => {
+        const matchesSearch = u.username && u.username.toLowerCase().includes(searchText.toLowerCase());
+        const matchesIsActive = selectedisactive === null || selectedisactive === undefined ? true : u.isActive === selectedisactive;
+        return matchesSearch && matchesIsActive;
+    });
     return (
         <>
+            <div class="text-2xl font-bold text-gray-800 bg-gray-100 py-3 px-6 rounded-lg text-center">
+                Quản Lý người dùng
+            </div>
+
+
+            <div className="p-4">
+                <div className="flex flex-col md:flex-row gap-4">
+                    <div className="w-full md:w-1/3">
+                        <Search
+                            type="text"
+                            placeholder="Tìm tên sản phẩm"
+                            onChange={(e) => setSearchText(e.target.value)}
+                            className="w-full px-4 py-2  rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                    <div className="w-full md:w-1/3 mt-2">
+                        <Select
+                            placeholder="Lọc theo trạng thái xác thực"
+                            className="w-full border rounded-md"
+                            allowClear
+                            onChange={(value) => setSelectedIsActive(value)}
+                        >
+                            <Option value={true}>Đã xác thực</Option>
+                            <Option value={false}>Chưa xác thực</Option>
+                        </Select>
+                    </div>
+                </div>
+            </div>
             <div className='p-4 bg-white rounded-lg shadow-lg'>
-                <Table columns={columns} scroll={{ x: 1200 }} loading={loading} dataSource={data} />
+                <Table columns={columns} scroll={{ x: 1200 }} loading={loading} dataSource={loading ? [] : filteredProducts} />
+                <UserDetail open={userdetail} onClose={() => setUserDetail(false)} user={selecteduser} />
             </div>
 
 

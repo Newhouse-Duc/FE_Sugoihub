@@ -86,7 +86,7 @@ const CreateGroupChat = ({ isOpen, onClose }) => {
         <Modal
             open={isOpen}
             centered
-            getContainer={false}
+            getContainer={() => document.body}
             maskClosable={false}
             onCancel={() => onClose()}
             footer={[

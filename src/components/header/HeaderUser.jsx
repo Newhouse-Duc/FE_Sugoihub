@@ -19,9 +19,12 @@ import { useSocket } from '../../socket/SocketContext';
 const HeaderUser = () => {
     const { socket } = useSocket()
     const [isScrolled, setIsScrolled] = useState(false);
+
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
+
     const [numbernotify, setNumberNotify] = useState(null)
     const [createPost, setOpenCreatePost] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -32,12 +35,15 @@ const HeaderUser = () => {
     const userinfor = useSelector((state) => state.auth.userinfor);
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
     const filteredUsers = searchTerm.trim() !== ''
         ? (listUser || []).filter((user) =>
             user.username.toLowerCase().includes(searchTerm.toLowerCase())
         )
         : [];
-
+    useEffect(() => {
+        setIsDropdownOpen(false);
+    }, [location.pathname]);
     useEffect(() => {
         const handleNotificationCount = () => {
             const data = { id: userinfor._id };
@@ -82,7 +88,6 @@ const HeaderUser = () => {
         }
     };
     const [open, setOpen] = useState(false);
-    const location = useLocation();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -184,7 +189,9 @@ const HeaderUser = () => {
             }
         }
     };
-
+    const handleDropdownToggle = () => {
+        setIsDropdownOpen(prevState => !prevState);
+    };
 
     return (
         <>
@@ -246,8 +253,9 @@ const HeaderUser = () => {
                                 )}
                                 trigger={['click']}
                                 placement="bottomRight"
-
-
+                                open={isDropdownOpen}
+                                onOpenChange={setIsDropdownOpen}
+                                destroyPopupOnHide={true}
 
                             >
                                 <button className="btn btn-ghost btn-circle" >
@@ -317,7 +325,7 @@ const HeaderUser = () => {
                         )}
                         trigger={['click']}
                         placement="bottomRight"
-
+                        destroyPopupOnHide={true}
                     >
                         <button
                             className={` rounded-full ${isDropdownOpen ? 'text-black bg-gray-100' : 'text-gray-500'} indicator`}

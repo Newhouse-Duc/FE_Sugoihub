@@ -29,7 +29,7 @@ const HistoryEditPost = ({ open, onClose, post }) => {
                 open={open}
                 onCancel={() => onClose()}
                 getContainer={() => document.body}
-
+                centered
                 closeIcon={null}
                 width={600}
                 className="profile-modal"

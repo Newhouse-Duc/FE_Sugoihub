@@ -38,23 +38,22 @@ export const chat = createSlice({
             }
         },
         updatelistchat: (state, action) => {
-            const { data } = action.payload
-            console.log("xem pay;pad", action.payload)
-            console.log("xem data", data)
-
+            const data = action.payload.data;
+            console.log("xem payload:", action.payload);
+            console.log("xem data:", data);
 
             const conversationIndex = state.conversation.findIndex(
                 conv => conv.conversationId === data.conversationId
             );
+            console.log('Index của conversation:', conversationIndex);
 
             if (conversationIndex !== -1) {
 
                 state.conversation[conversationIndex] = {
                     ...state.conversation[conversationIndex],
-                    groupName: data.groupName
+                    ...data
                 };
             }
-
         },
         deleteMember: (state, action) => {
             const { conversationId, deletemember } = action.payload;

@@ -224,7 +224,7 @@ const EditPost = ({ open, onClose, post }) => {
 
 
                 open={open}
-                getContainer={false}
+                getContainer={() => document.body}
                 maskClosable={false}
                 footer={[
                     <Button

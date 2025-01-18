@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Avatar } from "antd"
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion'
 const Sidebar = () => {
     const navigate = useNavigate()
     const mainMenuItems = [
@@ -32,15 +33,16 @@ const Sidebar = () => {
                     <div className="bg-gradient-to-b from-slate-200 to-slate-50 w-64 min-h-full px-4 py-6 shadow-xl">
                         {/* User Profile Section */}
                         <div className="flex items-center gap-4 px-2 py-4 mb-6 border-b border-slate-600">
-                            <div className="avatar">
-                                <div className="ring-primary ring-offset-base-100 w-12 rounded-full ring ring-offset-2">
-                                    <img src={userinfor.avatar.url} />
-                                </div>
-                            </div>
-                            <div>
-                                <h2 className="text-lg font-bold text-[#8c9291]">{userinfor.username}</h2>
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ delay: 0.3, type: "spring" }}
+                                className="text-4xl font-bold mb-4 text-gray-800"
+                            >
+                                Sugoi
+                                <span className="text-pink-400">Hub</span>
+                            </motion.div>
 
-                            </div>
                         </div>
 
                         {/* Navigation Menu */}

@@ -1,14 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Modal, message, Upload, Image, Input, Avatar, Carousel } from 'antd';
-
 import { allcommentbypost } from '../../redux/Admin/Admin_post/Admin_post.thunk';
-
 import { formatDistance } from 'date-fns';
-
-
+import { CiTimer } from "react-icons/ci";
 import { vi } from 'date-fns/locale';
 import { ThumbsUp, MessageSquare, Share2, MoreHorizontal } from 'lucide-react';
+import HistoryEditPost from './HistoryEditPost'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Parallax, FreeMode, EffectFade } from 'swiper/modules';
 
@@ -18,6 +16,7 @@ const Postdetail = ({ isOpen, onClose, post }) => {
     const dispatch = useDispatch()
     const comment = useSelector((state) => state.adminpost.comment)
     const videoRef = useRef(null);
+    const [openhistory, setOpenHistory] = useState(false)
     useEffect(() => {
 
         if (post) {
@@ -36,6 +35,9 @@ const Postdetail = ({ isOpen, onClose, post }) => {
             stopVideo();
         }
     }, [isOpen]);
+    const handleShowHistoryPost = () => {
+        setOpenHistory(true)
+    }
     return (
         <>
             <Modal
@@ -153,8 +155,12 @@ const Postdetail = ({ isOpen, onClose, post }) => {
                     <h3 className="text-xl font-bold text-gray-800 mb-2 flex items-center">
                         <MessageSquare className="w-5 h-5 mr-2" />
                         Tương tác của bài viết
-
+                        <Button className=' ml-2' icon={<CiTimer />} onClick={handleShowHistoryPost}>
+                            Lịch sử chỉnh sửa
+                        </Button>
+                        <HistoryEditPost open={openhistory} onClose={() => setOpenHistory(false)} post={post} />
                     </h3>
+
                     <div className="flex flex-col md:flex-row gap-6">
                         {/* Cột 1: Danh sách người thích */}
                         <div className="flex-1">
@@ -214,6 +220,12 @@ const Postdetail = ({ isOpen, onClose, post }) => {
                                                         ))}
                                                     </div>
                                                 )}
+                                                {commentItem.gif && (<img
+                                                    key={commentItem.gif.id}
+                                                    src={commentItem.gif.url}
+
+                                                    className="max-w-full  h-28 "
+                                                />)}
                                             </div>
                                         </div>
                                     ))}

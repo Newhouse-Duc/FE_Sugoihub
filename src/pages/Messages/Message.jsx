@@ -253,7 +253,7 @@ const Message = () => {
                 }
             };
             const handleUpdateConversation = (data) => {
-                dispatch(updatelistchat({ data }))
+                dispatch(updatelistchat(data))
 
             }
             socket.on("newinforgroupchat", handleUpdateConversation);
@@ -270,6 +270,7 @@ const Message = () => {
             };
         }
     }, [selectedConservation, socket, dispatch]);
+
 
     const sendMessage = async () => {
         if (newMessage.trim() !== "" || fileList.length > 0 || audioBlob) {
@@ -451,7 +452,7 @@ const Message = () => {
                             </div>
                             <CreateGroupChat isOpen={modalCreateGroup} onClose={() => setModalCreateGroup(false)} />
                             {/* Search Bar */}
-                            <div className="p-4 border-b border-base-300 shadow-sm">
+                            {/* <div className="p-4 border-b border-base-300 shadow-sm">
                                 <div className="relative">
                                     <input
                                         type="text"
@@ -471,24 +472,24 @@ const Message = () => {
                                             <Avatar
                                                 size={48}
                                                 className="object-cover"
-                                            // src={
-                                            //     (isGroup && avatar?.url)
-                                            //         ? avatar.url
-                                            //         : (!isGroup && friend?.avatar?.url)
-                                            //             ? friend.avatar.url
-                                            //             : null // Không có URL sẽ hiển thị icon
-                                            // }
-                                            // alt={isGroup ? name : friend?.username}
-                                            // icon={
-                                            //     (!(isGroup && avatar?.url) && <MdOutlineGroups3 />) && (!(friend?.avatar?.url) && <CiUser />)
-                                            // }
+                                            src={
+                                                (isGroup && avatar?.url)
+                                                    ? avatar.url
+                                                    : (!isGroup && friend?.avatar?.url)
+                                                        ? friend.avatar.url
+                                                        : null // Không có URL sẽ hiển thị icon
+                                            }
+                                            alt={isGroup ? name : friend?.username}
+                                            icon={
+                                                (!(isGroup && avatar?.url) && <MdOutlineGroups3 />) && (!(friend?.avatar?.url) && <CiUser />)
+                                            }
                                             />
                                             <h2 className="card-title">Shoes!</h2>
                                         </div>
                                     </div>
                                 )}
 
-                            </div>
+                            </div> */}
                             {loadinglistchat ? (
                                 <div className="flex w-52 flex-col gap-4">
                                     <div className="   gap-3 p-3 md:p-4 flex items-center">

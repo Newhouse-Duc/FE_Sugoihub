@@ -53,13 +53,13 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
     useEffect(() => {
         if (comment) {
             setCommentorg(comment)
-            console.log("xem comment nhận được: ", commentorg)
+
         }
     }, [comment])
     useEffect(() => {
         if (comment) {
             setCommentorg(comment)
-            console.log("xem comment nhận được: ", commentorg)
+
         }
     })
     const handleSubmit = async () => {
@@ -91,7 +91,7 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
                 console.log(`${key}:`, value);
             }
             const res = await dispatch(replyComment({ data })).unwrap()
-            if (res.success && comment.author._id !== userinfor._id) {
+            if (res.success) {
 
                 const replycomment = {
                     recipient: comment.author._id,
@@ -101,7 +101,10 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
                     type: "COMMENT_REPLY",
                     text: "đã phản hồi bình luận của bạn"
                 };
-                socket.emit("replycomment", replycomment);
+                if (comment.author._id !== userinfor._id) {
+                    socket.emit("replycomment", replycomment);
+                }
+
 
                 message.success('Đăng bình luận thành công');
                 setText("")
