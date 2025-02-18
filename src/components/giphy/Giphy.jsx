@@ -38,7 +38,7 @@ const Giphy = ({ onGifSelect }) => {
                 setGifs(data);
             });
         }
-        console.log("GIF được chọn:", selectedGif);
+
     }, [searchTerm, selectedGif])
 
     return (

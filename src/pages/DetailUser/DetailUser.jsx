@@ -220,7 +220,7 @@ const DetailUser = () => {
         <div className="flex flex-col items-center">
           <Avatar
             size={120}
-            src={detailUser?.avatar?.url}
+            src={detailUser?.avatar?.url || "https://avatar.iran.liara.run/public/4"}
             icon={<UserOutlined />}
             className="border-4 border-white shadow-lg hover:scale-105 transition-transform duration-300"
           />

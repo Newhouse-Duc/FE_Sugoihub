@@ -49,7 +49,7 @@ const CommentItem = ({
                 <div className="flex-shrink-0 mr-3">
                     <Avatar className="w-8 h-8">
                         <img
-                            src={comment?.author?.avatar?.url}
+                            src={comment?.author?.avatar?.url || "https://avatar.iran.liara.run/public/4"}
                             alt="avatar"
                             className="rounded-full w-full h-full object-cover"
                         />

@@ -43,7 +43,7 @@ const AdminUser = () => {
             key: "avatar",
             align: 'center',
             render: (avatar) =>
-                avatar?.url ? <Avatar src={avatar.url} /> : <Avatar icon="user" />,
+                avatar?.url ? <Avatar src={avatar.url || "https://avatar.iran.liara.run/public/4"} /> : <Avatar icon="user" />,
         },
         {
             title: "Tên người dùng",

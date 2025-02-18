@@ -32,7 +32,7 @@ export const SocketProvider = ({ children }) => {
             });
 
             return () => {
-                socketcf.off("updateOnlineUsers"); // Gỡ sự kiện
+                socketcf.off("updateOnlineUsers");
                 socketcf.off("disconnect");
                 if (socketcf.connected) {
                     socketcf.disconnect();

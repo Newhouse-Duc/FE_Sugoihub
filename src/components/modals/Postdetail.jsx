@@ -59,7 +59,7 @@ const Postdetail = ({ isOpen, onClose, post }) => {
                     {/* Header Section */}
                     <div className="flex gap-4 mt-4 items-start">
                         <Avatar
-                            src={post?.user?.avatar?.url}
+                            src={post?.user?.avatar?.url || "https://avatar.iran.liara.run/public/4"}
                             size={50}
                             className="flex-shrink-0 shadow"
                         />
@@ -172,7 +172,7 @@ const Postdetail = ({ isOpen, onClose, post }) => {
                                             <div className="avatar">
                                                 <div className="w-10 h-10 rounded-full ring-2 ring-offset-2 ring-blue-500 mx-1">
                                                     <img
-                                                        src={user.avatar?.url}
+                                                        src={user.avatar?.url || "https://avatar.iran.liara.run/public/4"}
                                                         alt={user.username}
                                                         className="w-full h-full rounded-full object-cover "
                                                     />
@@ -197,7 +197,7 @@ const Postdetail = ({ isOpen, onClose, post }) => {
                                             <div className="avatar">
                                                 <div className="w-10 h-10 rounded-full ring-2 ring-offset-2 ring-green-500 mx-1">
                                                     <img
-                                                        src={commentItem.author?.avatar?.url}
+                                                        src={commentItem.author?.avatar?.url || "https://avatar.iran.liara.run/public/4"}
                                                         alt={commentItem.author?.username}
                                                         className="w-full h-full rounded-full object-cover"
                                                     />

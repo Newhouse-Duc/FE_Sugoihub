@@ -22,7 +22,7 @@ const VerifyOtp = () => {
                 email: emailverify,
                 otp: otpValue
             };
-            console.log('Submitted OTP:', data);
+
             dispatch(verifyotp({ data }))
 
                 .finally(() => {
@@ -113,7 +113,7 @@ const VerifyOtp = () => {
                 className="w-full max-w-md "
             >
                 <div className="space-y-8">
-                    {/* Header */}
+
                     <motion.div variants={itemVariants} className="text-center">
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">Nhập mã xác minh</h1>
                         <p className="text-sm text-gray-500">
@@ -121,7 +121,7 @@ const VerifyOtp = () => {
                         </p>
                     </motion.div>
 
-                    {/* Back Button */}
+
                     <motion.button
                         variants={itemVariants}
                         type="button"
@@ -132,7 +132,7 @@ const VerifyOtp = () => {
                         Quay lại
                     </motion.button>
 
-                    {/* Form */}
+
                     <form onSubmit={formik.handleSubmit} className="space-y-6">
                         <motion.div variants={itemVariants} className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                             {formik.values.otp.map((digit, index) => (
@@ -157,7 +157,6 @@ const VerifyOtp = () => {
                             ))}
                         </motion.div>
 
-                        {/* Error Message */}
                         {formik.errors.otp && formik.touched.otp && (
                             <motion.div
                                 variants={itemVariants}
@@ -169,7 +168,7 @@ const VerifyOtp = () => {
                             </motion.div>
                         )}
 
-                        {/* Submit Button */}
+
                         <motion.button
                             variants={itemVariants}
                             type="submit"
@@ -193,7 +192,7 @@ const VerifyOtp = () => {
                             )}
                         </motion.button>
 
-                        {/* Resend OTP */}
+
                         <motion.div
                             variants={itemVariants}
                             className="text-center text-gray-500 text-sm"

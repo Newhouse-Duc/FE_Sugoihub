@@ -67,7 +67,7 @@ const Login = () => {
                     </motion.div>
 
                     <form className="space-y-6" onSubmit={formik.handleSubmit}>
-                        {/* Email Field */}
+
 
                         <motion.div variants={itemVariants} className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700">
@@ -102,7 +102,7 @@ const Login = () => {
                             )}
                         </motion.div>
 
-                        {/* Password Field */}
+
                         <motion.div variants={itemVariants} className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <label className="block text-sm font-medium text-gray-700">

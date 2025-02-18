@@ -44,7 +44,7 @@ const UserDetail = ({ open, onClose, user }) => {
                     <div className="w-32 h-32 rounded-full border-4 border-white bg-white overflow-hidden">
                         {user?.avatar?.url ? (
                             <img
-                                src={user.avatar.url}
+                                src={user.avatar.url || "https://avatar.iran.liara.run/public/4"}
                                 alt={user?.username}
                                 className="w-full h-full object-cover"
                             />

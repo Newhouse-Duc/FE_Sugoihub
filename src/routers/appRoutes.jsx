@@ -15,7 +15,7 @@ const AppRoutes = () => {
     return (
         <Suspense fallback={<Loading />}>
             <Routes>
-                {/* Routes dành cho user */}
+
                 <Route
                     path="/*"
                     element={
@@ -24,13 +24,13 @@ const AppRoutes = () => {
                                 {homeRoutes.map(({ path, element }) => (
                                     <Route key={path} path={path} element={element} />
                                 ))}
-                                {/* Route not found cho user */}
+
                                 <Route path="*" element={<NotFound />} />
                             </Routes>
                         </AuthWrapper>
                     }
                 />
-                {/* Routes dành cho admin */}
+
                 <Route
                     path="/admin/*"
                     element={
@@ -39,13 +39,13 @@ const AppRoutes = () => {
                                 {dashboardRoute.map(({ path, element }) => (
                                     <Route key={path} path={path} element={element} />
                                 ))}
-                                {/* Route not found cho admin */}
+
                                 <Route path="*" element={<NotFound />} />
                             </Routes>
                         </AuthAdminWrapper>
                     }
                 />
-                {/* Route not found tổng thể */}
+
                 <Route path="*" element={<NotFound />} />
             </Routes>
         </Suspense>

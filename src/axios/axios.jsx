@@ -1,7 +1,7 @@
 
 import axios from 'axios';
 import { handlerefreshtoken } from '../services/user';
-// Tạo instance mới của axios
+
 const API_URL = import.meta.env.VITE_APP_API_URl;
 
 const axiosInstance = axios.create({
@@ -14,7 +14,7 @@ const axiosInstance = axios.create({
     }
 });
 
-// Thêm interceptor request
+
 axiosInstance.interceptors.request.use(
     (config) => {
 

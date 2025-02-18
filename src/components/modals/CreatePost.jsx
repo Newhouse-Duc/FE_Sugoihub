@@ -214,11 +214,11 @@ const CreatePost = ({ isOpen, onClose }) => {
                 ]}
 
             >
-                {/* Header: Avatar và tên người dùng */}
+
                 <div className="flex items-center mb-4">
                     <div className="w-12 h-12">
                         <img
-                            src={userinfor.avatar?.url}
+                            src={userinfor.avatar?.url || "https://avatar.iran.liara.run/public/4"}
                             className="rounded-full w-full h-full object-cover ring-2 ring-blue-500"
                             alt="User avatar"
                         />

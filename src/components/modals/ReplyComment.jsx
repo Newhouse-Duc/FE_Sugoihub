@@ -32,12 +32,14 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
     const handleGifSelect = (gif) => {
         setSelectedGif(gif);
     };
+
     const handleClickUpload = () => {
         setShowUpload(!showUpload);
         setShowGif(false)
     };
     const handleShowGif = () => {
         setShowGif(!showgif)
+        setShowUpload(false);
     }
 
     const handleChangeUpload = ({ fileList: newFileList }) => {
@@ -87,9 +89,7 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
                     data.append("images", file.originFileObj);
                 }
             });
-            for (let [key, value] of data.entries()) {
-                console.log(`${key}:`, value);
-            }
+
             const res = await dispatch(replyComment({ data })).unwrap()
             if (res.success) {
 
@@ -122,6 +122,8 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
     }
     const handleCloseModal = () => {
         setCommentorg(null);
+        setShowGif(false)
+        setShowUpload(false)
         onClose();
     };
     return (
@@ -183,7 +185,7 @@ const ReplyComment = ({ isOpen, onClose, comment }) => {
                         <div className="flex-1">
                             <div className="flex items-start justify-between">
                                 <p className="font-semibold text-gray-900">{commentorg?.author?.username}</p>
-                                <span className="text-sm text-gray-500"> {commentorg?.createdAt}</span>
+                                <span className="text-sm text-gray-500">{new Date(commentorg?.createdAt).toLocaleString()}</span>
                             </div>
 
                             <p className="mt-2 text-gray-700">{commentorg?.content}</p>

@@ -289,7 +289,7 @@ const Notifications = () => {
                                         <div className="relative flex-shrink-0">
                                             <Avatar
                                                 size={50}
-                                                src={notification.sender.avatar.url}
+                                                src={notification.sender.avatar.url || "https://avatar.iran.liara.run/public/4"}
                                                 icon={<UserOutlined />}
                                                 className="w-12 h-12 rounded-full object-cover ring-2 ring-white dark:ring-gray-700 shadow-sm group-hover:ring-blue-200 dark:group-hover:ring-gray-600 transition-all"
                                             />

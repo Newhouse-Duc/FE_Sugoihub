@@ -29,7 +29,7 @@ const ResetPassword = () => {
         onSubmit: async (data) => {
 
 
-            console.log("check giá trị : ", data);
+
 
             dispatch(resetPassword({ data }))
 
@@ -42,7 +42,7 @@ const ResetPassword = () => {
             <div className=" bg-gray-50 flex flex-col items-center justify-center p-4">
                 <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg border border-gray-100">
                     <div className="px-6 py-8 sm:px-8">
-                        {/* Header Section */}
+
                         <div className="text-center space-y-3 mb-8">
                             <h1 className="text-2xl font-bold text-gray-900">Cài lại mật khẩu để đăng nhập</h1>
                             <p className="text-[15px] text-gray-500 leading-relaxed">
@@ -50,7 +50,7 @@ const ResetPassword = () => {
                             </p>
                         </div>
 
-                        {/* Back Button */}
+
                         <button
                             onClick={handleBack}
                             className="mb-6 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 flex items-center gap-2"
@@ -59,9 +59,9 @@ const ResetPassword = () => {
                         </button>
 
                         <form onSubmit={formik.handleSubmit} className="space-y-6">
-                            {/* Password Fields in vertical layout */}
+
                             <div className="space-y-4">
-                                {/* Password Field */}
+
                                 <div className="space-y-2">
                                     <label
                                         htmlFor="password"
@@ -85,7 +85,7 @@ const ResetPassword = () => {
                                     )}
                                 </div>
 
-                                {/* Confirm Password Field */}
+
                                 <div className="space-y-2">
                                     <label
                                         htmlFor="repassword"
@@ -110,14 +110,14 @@ const ResetPassword = () => {
                                 </div>
                             </div>
 
-                            {/* Error Messages */}
+
                             {formik.errors.otp && formik.touched.otp && (
                                 <div className="text-red-500 text-sm text-center">
                                     {formik.errors.otp}
                                 </div>
                             )}
 
-                            {/* Submit Button */}
+
                             <button
                                 type="submit"
                                 className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 

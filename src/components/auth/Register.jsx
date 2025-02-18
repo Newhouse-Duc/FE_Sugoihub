@@ -92,7 +92,7 @@ const Register = () => {
                 </motion.div>
 
                 <form className="space-y-4" onSubmit={formik.handleSubmit}>
-                    {/* Username */}
+
                     <motion.div variants={itemVariants} className="space-y-2">
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -119,7 +119,7 @@ const Register = () => {
                         )}
                     </motion.div>
 
-                    {/* Email */}
+
                     <motion.div variants={itemVariants} className="space-y-2">
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -146,7 +146,7 @@ const Register = () => {
                         )}
                     </motion.div>
 
-                    {/* Date of Birth */}
+
                     <motion.div variants={itemVariants} className="space-y-2">
                         <div className="relative flex gap-2">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -206,7 +206,7 @@ const Register = () => {
                         ) : null}
                     </motion.div>
 
-                    {/* Password */}
+
                     <motion.div variants={itemVariants} className="space-y-2">
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -233,7 +233,7 @@ const Register = () => {
                         )}
                     </motion.div>
 
-                    {/* Confirm Password */}
+
                     <motion.div variants={itemVariants} className="space-y-2">
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

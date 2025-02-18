@@ -207,7 +207,7 @@ const Setting = () => {
                                 <div className="dropdown dropdown-right ">
 
                                     <Avatar tabIndex={0}
-                                        src={userinfor?.avatar?.url}
+                                        src={userinfor?.avatar?.url || "https://avatar.iran.liara.run/public/4"}
                                         size={88}
                                         className="border border-gray-300"
                                     />

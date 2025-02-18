@@ -131,13 +131,13 @@ const InforConservation = ({ isOpen, onClose, group, onUpdateGroup }) => {
     }
     useEffect(() => {
         if (group) {
-            setGroupName(group.name); // Cập nhật tên nhóm từ group
-            setFileList(group.avatar ? [{ url: group.avatar.url, publicId: group.avatar.publicId }] : []); // Cập nhật fileList từ group.avatar
-            setNewAdmin(group.admin); // Cập nhật admin từ group
-            setMembers([]); // Reset members khi mở modal
-            setAvatarDelete({}); // Reset avatardelete
-            setPreviewOpen(false); // Reset previewOpen
-            setPreviewImage(''); // Reset previewImage
+            setGroupName(group.name);
+            setFileList(group.avatar ? [{ url: group.avatar.url, publicId: group.avatar.publicId }] : []);
+            setNewAdmin(group.admin);
+            setMembers([]);
+            setAvatarDelete({});
+            setPreviewOpen(false);
+            setPreviewImage('');
         }
     }, [group]);
 
@@ -432,7 +432,7 @@ const InforConservation = ({ isOpen, onClose, group, onUpdateGroup }) => {
 
     }, [group, dispatch, onUpdateGroup, socket, conversation]);
     const handleCloseModal = () => {
-        // Reset các state về giá trị ban đầu từ group
+
         if (group) {
             setGroupName(group.name);
             setFileList(group.avatar ? [{ url: group.avatar.url, publicId: group.avatar.publicId }] : []);
@@ -442,7 +442,7 @@ const InforConservation = ({ isOpen, onClose, group, onUpdateGroup }) => {
             setPreviewOpen(false);
             setPreviewImage('');
         }
-        onClose(); // Đóng modal
+        onClose();
     };
     return (
         <Modal

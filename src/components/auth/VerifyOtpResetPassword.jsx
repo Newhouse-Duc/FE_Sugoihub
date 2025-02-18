@@ -123,7 +123,7 @@ const VerifyOtpResetPassword = () => {
                 className="w-full max-w-md "
             >
                 <div className="space-y-8">
-                    {/* Header */}
+                    Ư
                     <motion.div variants={itemVariants} className="text-center">
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">Nhập mã xác minh</h1>
                         <p className="text-sm text-gray-500">
@@ -131,7 +131,7 @@ const VerifyOtpResetPassword = () => {
                         </p>
                     </motion.div>
 
-                    {/* Back Button */}
+
                     <motion.button
                         variants={itemVariants}
                         type="button"
@@ -142,7 +142,7 @@ const VerifyOtpResetPassword = () => {
                         Quay lại
                     </motion.button>
 
-                    {/* Form */}
+
                     <form onSubmit={formik.handleSubmit} className="space-y-6">
                         <motion.div variants={itemVariants} className="flex flex-wrap items-center justify-center gap-3">
                             {formik.values.otp.map((digit, index) => (
@@ -167,7 +167,7 @@ const VerifyOtpResetPassword = () => {
                             ))}
                         </motion.div>
 
-                        {/* Error Message */}
+
                         {formik.errors.otp && formik.touched.otp && (
                             <motion.div
                                 variants={itemVariants}
@@ -179,7 +179,7 @@ const VerifyOtpResetPassword = () => {
                             </motion.div>
                         )}
 
-                        {/* Submit Button */}
+
                         <motion.button
                             variants={itemVariants}
                             type="submit"
@@ -200,7 +200,6 @@ const VerifyOtpResetPassword = () => {
                             )}
                         </motion.button>
 
-                        {/* Resend OTP */}
                         <motion.div
                             variants={itemVariants}
                             className="text-center text-gray-500 text-sm"

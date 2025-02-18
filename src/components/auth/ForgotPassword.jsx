@@ -23,7 +23,7 @@ const ForgotPassword = () => {
         initialValues: initialValueEmail,
         validationSchema: validateForgotPasswordSchema,
         onSubmit: (data) => {
-            console.log("check giá trị : ", data);
+
             dispatch(setEmail(data.email));
             dispatch(forgotPassword({ data }));
         }
@@ -56,7 +56,7 @@ const ForgotPassword = () => {
                 className="w-full max-w-md   "
             >
                 <div className="space-y-8">
-                    {/* Header */}
+
                     <motion.div variants={itemVariants} className="text-center">
                         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                             Quên Mật Khẩu
@@ -66,7 +66,7 @@ const ForgotPassword = () => {
                         </p>
                     </motion.div>
 
-                    {/* Back Button */}
+
                     <motion.button
                         variants={itemVariants}
                         type="button"
@@ -81,7 +81,7 @@ const ForgotPassword = () => {
 
                     {/* Form */}
                     <form className="space-y-6" onSubmit={formik.handleSubmit}>
-                        {/* Email Field */}
+
                         <motion.div variants={itemVariants} className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700">
                                 Địa chỉ Email
@@ -114,7 +114,7 @@ const ForgotPassword = () => {
                             )}
                         </motion.div>
 
-                        {/* Submit Button */}
+
                         <motion.button
                             variants={itemVariants}
                             type="submit"

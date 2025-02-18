@@ -107,15 +107,15 @@ const ViewPost = ({ isOpen, onClose, post, onCommentClick }) => {
                 footer={null}
             >
                 <div className='max-h-[calc(80vh-80px)] overflow-auto'>
-                    {/* Header Section */}
+
                     <div className="flex gap-4 mt-4 items-start">
                         <Avatar
-                            src={post?.user?.avatar?.url}
+                            src={post?.user?.avatar?.url || "https://avatar.iran.liara.run/public/4"}
                             size={50}
                             className="flex-shrink-0 shadow"
                         />
                         <div className="flex-grow">
-                            <h3 className="text-lg font-semibold text-gray-800">{post?.user?.username || "Người dùng ẩn danh"}</h3>
+                            <h3 className="text-lg font-semibold text-gray-800">{post?.user?.username}</h3>
                             <div className="flex items-center text-sm text-gray-500 gap-3">
                                 <p>  {post && formatDate(post?.createdAt)}</p>
                                 {post?.visibility === "public" && (
@@ -131,7 +131,7 @@ const ViewPost = ({ isOpen, onClose, post, onCommentClick }) => {
                         </div>
                     </div>
 
-                    {/* Post Content */}
+
                     <div className="mt-4">
                         <p className="text-gray-800 mb-4">{post?.content}</p>
                         <Swiper

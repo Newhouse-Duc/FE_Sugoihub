@@ -29,6 +29,7 @@ const CommentPost = ({ isOpen, onClose, post }) => {
     };
     const handleShowGif = () => {
         setShowGif(!showgif)
+        setShowUpload(false);
     }
     const [text, setText] = useState("");
 
@@ -64,11 +65,6 @@ const CommentPost = ({ isOpen, onClose, post }) => {
                 }
             });
 
-            for (let [key, value] of data.entries()) {
-                console.log(`${key}:`, value);
-            }
-
-
             const res = await dispatch(newCommentPost({ data })).unwrap()
 
             if (res.success) {
@@ -99,8 +95,8 @@ const CommentPost = ({ isOpen, onClose, post }) => {
 
 
         } catch (error) {
-            console.log("Xem lỗi nào : ", error)
-            message.error('Có lỗi xảy ra khi đăng bình luận');
+
+            message.error(error.message);
         } finally {
             setLoading(false);
         }
@@ -119,7 +115,11 @@ const CommentPost = ({ isOpen, onClose, post }) => {
         }
     }, [isOpen, scrollPosition]);
 
-
+    const handleClose = () => {
+        setShowGif(false)
+        setShowUpload(false);
+        onClose()
+    }
     return (
         <Modal
             title={
@@ -130,7 +130,7 @@ const CommentPost = ({ isOpen, onClose, post }) => {
             centered
             getContainer={() => document.body}
             open={isOpen}
-            onCancel={() => onClose()}
+
             maskClosable={false}
 
             closeIcon={null}
@@ -140,7 +140,7 @@ const CommentPost = ({ isOpen, onClose, post }) => {
                 <Button
                     key="cancel"
                     type="dashed"
-                    onClick={() => onClose()}
+                    onClick={handleClose}
                     icon={<CloseCircleTwoTone />}
                     className="hover:bg-gray-100 rounded-md px-4 py-2 text-gray-600 mr-2"
                 >
@@ -160,15 +160,15 @@ const CommentPost = ({ isOpen, onClose, post }) => {
             ]}
         >
             <div>
-                {/* Header Section */}
+
                 <div className="flex gap-4 mt-4 items-start ">
                     <Avatar
-                        src={post?.user?.avatar?.url}
+                        src={post?.user?.avatar?.url || "https://.iran.liara.run/public/4"}
                         size={50}
                         className="flex-shrink-0 shadow"
                     />
                     <div className="flex-grow">
-                        <h3 className="text-lg font-semibold text-gray-800">{post?.user?.username || "Người dùng ẩn danh"}</h3>
+                        <h3 className="text-lg font-semibold text-gray-800">{post?.user?.username}</h3>
                         <div className="flex items-center text-sm text-gray-500 gap-3">
                             <p>{new Date(post?.createdAt).toLocaleString()}</p>
                             {post?.visibility === "public" && (

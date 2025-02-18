@@ -6,9 +6,7 @@ import { motion } from "framer-motion";
 const ListFriend = ({ listfriend }) => {
     const navigate = useNavigate()
     const userinfor = useSelector((state) => state.auth.userinfor);
-    useEffect(() => {
-        console.log("xem dâdadada", listfriend)
-    }, [listfriend])
+
     const handleUserClick = (userId) => {
 
         navigate(userId === userinfor._id ? "/account" : `/user/${userId}`);

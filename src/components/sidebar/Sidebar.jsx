@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Avatar } from "antd"
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion'
+import { Card } from 'antd';
 const Sidebar = () => {
     const navigate = useNavigate()
     const mainMenuItems = [
@@ -26,49 +27,52 @@ const Sidebar = () => {
     return (
 
         <>
-            <div className="drawer xl:drawer-open">
-                <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
 
-                <div className="drawer-side min-h-screen">
-                    <div className="bg-gradient-to-b from-slate-200 to-slate-50 w-64 min-h-full px-4 py-6 shadow-xl">
-                        {/* User Profile Section */}
-                        <div className="flex items-center gap-4 px-2 py-4 mb-6 border-b border-slate-600">
-                            <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{ delay: 0.3, type: "spring" }}
-                                className="text-4xl font-bold mb-4 text-gray-800"
-                            >
-                                Sugoi
-                                <span className="text-pink-400">Hub</span>
-                            </motion.div>
+            <Card
 
-                        </div>
+                bordered={false}
+                style={{
+                    width: 300,
+                }}
+            >
+                <div className="bg-gradient-to-b from-slate-200 to-slate-50  min-h-full px-4 py-6 shadow-xl">
 
-                        {/* Navigation Menu */}
-                        <ul className="space-y-2">
-                            {mainMenuItems.map((item) => (
-                                <li key={item.path}>
-                                    <button
-                                        onClick={() => navigate(item.path)}
-                                        className="w-full flex items-center px-4 py-3 text-[#646666] hover:bg-[#00CDB8] rounded-lg transition-all duration-200 group"
-                                    >
-                                        <i className={`${item.icon} mr-3 text-lg group-hover:text-white`}></i>
-                                        <span className="font-medium group-hover:text-white">
-                                            {item.label}
-                                        </span>
-                                        {item.badge && (
-                                            <span className="ml-auto px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded-full">
-                                                {item.badge}
-                                            </span>
-                                        )}
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
+                    <div className="flex items-center gap-4 px-2 py-4 mb-6 border-b border-slate-600">
+                        <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.3, type: "spring" }}
+                            className="text-4xl font-bold mb-4 text-gray-800 mx-auto"
+                        >
+                            Sugoi
+                            <span className="text-pink-400">Hub</span>
+                        </motion.div>
+
                     </div>
+
+
+                    <ul className="space-y-2">
+                        {mainMenuItems.map((item) => (
+                            <li key={item.path}>
+                                <button
+                                    onClick={() => navigate(item.path)}
+                                    className="w-full flex items-center px-4 py-3 text-[#646666] hover:bg-[#00CDB8] rounded-lg transition-all duration-200 group"
+                                >
+                                    <i className={`${item.icon} mr-3 text-lg group-hover:text-white`}></i>
+                                    <span className="font-medium group-hover:text-white">
+                                        {item.label}
+                                    </span>
+                                    {item.badge && (
+                                        <span className="ml-auto px-2 py-1 text-xs font-medium bg-blue-500 text-white rounded-full">
+                                            {item.badge}
+                                        </span>
+                                    )}
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
-            </div>
+            </Card>
         </>
     );
 };

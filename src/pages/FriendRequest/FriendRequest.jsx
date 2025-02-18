@@ -51,8 +51,8 @@ const FriendRequest = () => {
                                 <div className="w-16 h-16 rounded-full overflow-hidden border border-gray-200">
                                     <img
                                         src={
-                                            request.requesterId.avatar?.url ||
-                                            "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                                            request.requesterId.avatar?.url || "https://avatar.iran.liara.run/public/4"
+
                                         }
                                         alt={request.requesterId.username}
                                         className="object-cover w-full h-full"

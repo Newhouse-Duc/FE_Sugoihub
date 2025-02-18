@@ -451,45 +451,7 @@ const Message = () => {
                                 </div>
                             </div>
                             <CreateGroupChat isOpen={modalCreateGroup} onClose={() => setModalCreateGroup(false)} />
-                            {/* Search Bar */}
-                            {/* <div className="p-4 border-b border-base-300 shadow-sm">
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        value={searchText}
-                                        onChange={(e) => setSearchText(e.target.value)}
-                                        placeholder="Tìm kiếm tin nhắn..."
-                                        className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-full bg-gray-50 transition-all duration-300 ease-in-out focus:bg-white focus:ring-2 focus:ring-primary focus:outline-none"
-                                    />
 
-                                    <i className="bi bi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 transition-colors duration-300"></i>
-
-                                </div>
-                                {searchText.trim() !== "" && (
-                                    <div className="mt-2 card card-compact bg-base-100 w-56 shadow-xl z-10 fixed ">
-
-                                        <div className="card-body">
-                                            <Avatar
-                                                size={48}
-                                                className="object-cover"
-                                            src={
-                                                (isGroup && avatar?.url)
-                                                    ? avatar.url
-                                                    : (!isGroup && friend?.avatar?.url)
-                                                        ? friend.avatar.url
-                                                        : null // Không có URL sẽ hiển thị icon
-                                            }
-                                            alt={isGroup ? name : friend?.username}
-                                            icon={
-                                                (!(isGroup && avatar?.url) && <MdOutlineGroups3 />) && (!(friend?.avatar?.url) && <CiUser />)
-                                            }
-                                            />
-                                            <h2 className="card-title">Shoes!</h2>
-                                        </div>
-                                    </div>
-                                )}
-
-                            </div> */}
                             {loadinglistchat ? (
                                 <div className="flex w-52 flex-col gap-4">
                                     <div className="   gap-3 p-3 md:p-4 flex items-center">

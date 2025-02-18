@@ -74,27 +74,26 @@ const Profile = ({ isOpen, onClose }) => {
             try {
                 setLoading(true);
 
-                // Xử lý ngày tháng năm sinh
+
                 const { day, month, year, ...otherValues } = values;
                 const birthDateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const birthDate = new Date(birthDateString);
 
-                // Kiểm tra tính hợp lệ của ngày tháng năm sinh
                 if (isNaN(birthDate.getTime())) {
                     message.error('Ngày tháng năm sinh không hợp lệ.');
                     return;
                 }
 
-                // Tạo FormData để gửi dữ liệu
+
                 const data = new FormData();
                 if (removeAvatar !== null) {
                     data.append('removeAvatar', removeAvatar);
                 }
                 data.append('username', otherValues.username);
                 data.append('bio', otherValues.bio);
-                data.append('birthDate', birthDate.toISOString()); // Chuyển ngày sang định dạng ISO
+                data.append('birthDate', birthDate.toISOString());
 
-                // Thêm avatar nếu có
+
                 fileList.forEach((file) => {
                     if (file.originFileObj) {
                         data.append('avatar', file.originFileObj);
@@ -103,10 +102,6 @@ const Profile = ({ isOpen, onClose }) => {
 
                 const res = await dispatch(updateprofileuser({ data })).unwrap();
 
-                // Log dữ liệu FormData
-                for (let [key, value] of data.entries()) {
-                    console.log(`${key}:`, value);
-                }
 
                 if (res.success) {
 
@@ -176,7 +171,7 @@ const Profile = ({ isOpen, onClose }) => {
                                 <div className="dropdown dropdown-right ">
 
                                     <Avatar tabIndex={0}
-                                        src={userinfor?.avatar?.url}
+                                        src={userinfor?.avatar?.url || "https://avatar.iran.liara.run/public/4"}
                                         size={88}
                                         className="border border-gray-300"
                                     />

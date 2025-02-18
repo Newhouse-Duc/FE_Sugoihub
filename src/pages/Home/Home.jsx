@@ -52,7 +52,7 @@ const Home = () => {
                         <div className="flex-shrink-0">
                             <div className="relative w-10 h-10 md:w-12 md:h-12">
                                 <img
-                                    src={userinfor?.avatar?.url}
+                                    src={userinfor?.avatar?.url || "https://avatar.iran.liara.run/public/4"}
                                     className="rounded-full w-full h-full object-cover ring-2 ring-blue-500 ring-offset-2"
                                     alt="User avatar"
                                 />

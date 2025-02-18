@@ -57,10 +57,10 @@ const HistoryEditPost = ({ open, onClose, post }) => {
                                 <p className="text-blue-600 font-semibold text-sm">
                                     Thời gian sửa: {new Date(post?.createdAt).toLocaleString()}
                                 </p>
-                                {/* Phần thông tin người dùng */}
+
                                 <div className="flex gap-4 items-start">
                                     <Avatar
-                                        src={post?.user?.avatar?.url}
+                                        src={post?.user?.avatar?.url || "https://avatar.iran.liara.run/public/4"}
                                         size={50}
                                         className="flex-shrink-0 shadow"
                                     />
@@ -72,11 +72,11 @@ const HistoryEditPost = ({ open, onClose, post }) => {
                                     </div>
                                 </div>
 
-                                {/* Phần nội dung bài viết */}
+
                                 <div className="mt-4">
                                     <p className="text-gray-800 mb-4">{post?.content}</p>
 
-                                    {/* Phần hình ảnh và video */}
+
                                     <Swiper
                                         modules={[Navigation, Pagination, Parallax, FreeMode, EffectFade]}
                                         effect="slide"
